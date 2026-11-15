@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @font-face { font-family:'Ostrich'; src:url('file://{{ font_dir|safe }}/OstrichSans-Medium.otf'); }
+  @font-face { font-family:'Mont'; src:url('file://{{ font_dir|safe }}/Montserrat-Regular.ttf'); font-weight:400; }
+  @font-face { font-family:'Mont'; src:url('file://{{ font_dir|safe }}/Montserrat-SemiBold.ttf'); font-weight:600; }
+  @font-face { font-family:'Mont'; src:url('file://{{ font_dir|safe }}/Montserrat-Bold.ttf'); font-weight:700; }
+  @page { size: {{ page_w }}px {{ page_h }}px; margin:0; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Mont'; color:#1a1a1a; }
+  .page { width:{{ page_w }}px; padding:0 0 36px 0; page-break-after:always; page-break-inside:avoid; }
+  .hdr { background:#161616; border-left:10px solid #c76a75; padding:20px 36px; }
+  .hdr h1 { color:#fff; font-size:34px; font-weight:400; font-family:'Ostrich'; letter-spacing:0.5px; }
+  .hdr .sub { color:#c8c8c8; font-size:16px; font-weight:400; margin-top:6px; }
+  .slate-hdr { display:flex; justify-content:space-between; align-items:center; }
+  .hdr-len { color:#fff; font-size:44px; font-weight:700; white-space:nowrap; padding-left:28px; }
+  /* SLATE */
+  .slate { padding:44px 36px 0 36px; }
+  .proj { text-align:center; margin-bottom:14px; }
+  .proj .name { font-size:52px; font-weight:400; font-family:'Ostrich'; color:#1a1a1a; letter-spacing:1px; }
+  .proj .desc { font-size:20px; font-weight:400; color:#5a5a5a; margin-top:8px; max-width:65ch; margin-left:auto; margin-right:auto; line-height:1.4; }
+  .bracket { max-width:65ch; margin:0 auto 36px auto; text-align:center;
+             border-top:2px solid #2f5688; border-bottom:2px solid #2f5688; padding:22px 30px; }
+  .bracket .bk-lab { color:#2f5688; font-size:17px; font-weight:700; letter-spacing:1.5px; }
+  .bracket .bk-log { font-size:26px; font-weight:600; color:#262626; line-height:1.35; margin-top:6px; }
+  .bracket .bk-syn { font-size:18px; font-weight:400; color:#3a3a3a; line-height:1.45; margin-top:6px; }
+  .cols { max-width:134ch; margin:0 auto; columns:2; column-gap:52px; column-fill:balance; }
+  .colblock { break-inside:avoid; padding:0 14px; margin-bottom:22px; }
+  .colblock .lab { color:#2f5688; font-size:20px; font-weight:700; margin-bottom:6px; text-align:center; }
+  .colblock .body { font-size:18px; font-weight:400; color:#323232; line-height:1.45; max-width:65ch; margin:0 auto; text-align:left; }
+  .colblock { break-inside:avoid; border-left:5px solid #2f5688; padding-left:14px; margin-bottom:22px; }
+  .colblock .lab { color:#2f5688; font-size:20px; font-weight:700; margin-bottom:6px; }
+  .colblock .body { font-size:18px; font-weight:400; color:#323232; line-height:1.4; }
+  .colblock.sage .lab { color:#6a9e7a; }
+  /* BOARD */
+  .board { display:flex; flex-wrap:wrap; gap:22px; padding:16px 36px 0 36px; }
+  .cell { width:{{ thumb }}px; break-inside:avoid; }
+  .cell img { width:{{ thumb }}px; height:{{ thumb_h }}px; object-fit:cover; border:1px solid #b4b4b4; display:block; }
+  .cap { border-left:5px solid #2f5688; padding-left:12px; margin-top:8px; }
+  .cap .id { font-size:20px; font-weight:700; color:#1a1a1a; }
+  .cap .file { font-size:15px; font-weight:600; color:#2f5688; margin-top:2px; word-break:break-all; }
+  .cap .chips { font-size:14px; font-weight:600; color:#c76a75; margin-top:2px; word-break:break-all; }
+  .cap .desc { font-size:18px; font-weight:400; color:#3c3c3c; margin-top:3px; line-height:1.3; }
+  .cap .snd { font-size:16px; font-weight:400; margin-top:4px; line-height:1.35; }
+  .cap .snd b.in { color:#6a9e7a; } .cap .snd b.off { color:#2f5688; } .cap .snd b.beat { color:#c76a75; }
+  .closer { margin:20px 36px 0 36px; border-top:1px solid #e4e1d9; padding-top:14px;
+            border-left:5px solid #6a9e7a; padding-left:14px; break-inside:avoid; }
+  .closer .lab { color:#6a9e7a; font-size:19px; font-weight:700; margin-bottom:6px; }
+  .closer .body { font-size:17px; font-weight:400; color:#373737; line-height:1.45; }
+</style></head><body>
+
+{% if macro %}
+<div class="page">
+  <div class="hdr slate-hdr">
+    <div><h1>SHOT SHEET — TITLE</h1><div class="sub">{{ subline }}</div></div>
+    {% if duration %}<div class="hdr-len">{{ duration }}</div>{% endif %}
+  </div>
+  <div class="slate">
+    <div class="proj">
+      <div class="name">{{ job }}</div>
+      {% if macro.logline %}<div class="desc">{{ macro.logline }}</div>{% endif %}
+    </div>
+    {% if macro.synopsis %}
+    <div class="bracket">
+      <div class="bk-lab">SYNOPSIS</div><div class="bk-syn">{{ macro.synopsis }}</div>
+    </div>
+    {% endif %}
+    <div class="cols">
+      {% if macro.intent %}<div class="colblock"><div class="lab">INTENT / END USE</div><div class="body">{{ macro.intent }}</div></div>{% endif %}
+      {% if macro.structure %}<div class="colblock"><div class="lab">STRUCTURE</div><div class="body">{{ macro.structure }}</div></div>{% endif %}
+      {% if macro.pacing %}<div class="colblock"><div class="lab">PACING + EDIT STYLE</div><div class="body">{{ macro.pacing }}</div></div>{% endif %}
+      {% if macro.visual %}<div class="colblock"><div class="lab">VISUAL NOTES</div><div class="body">{{ macro.visual }}</div></div>{% endif %}
+      {% if macro.credits %}<div class="colblock"><div class="lab">CREDITS</div><div class="body">{{ macro.credits }}</div></div>{% endif %}
+      {% if macro.existing_track %}<div class="colblock"><div class="lab">EXISTING TRACK</div><div class="body">{{ macro.existing_track }}</div></div>{% endif %}
+      {% if closer %}<div class="colblock sage"><div class="lab">{{ closer.head }}</div><div class="body">{{ closer.body }}</div></div>{% endif %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% for page in board_pages %}
+<div class="page">
+  <div class="hdr"><h1>{{ job }}</h1><div class="sub">BOARD PAGE {{ loop.index }}/{{ board_pages|length }} · {{ subline }}</div></div>
+  <div class="board">
+    {% for s in page %}
+    <div class="cell">
+      <img src="data:image/jpeg;base64,{{ s.b64 }}">
+      <div class="cap">
+        <div class="id">SHOT {{ s.id }}{% if s.type %} · {{ s.type }}{% endif %}{% if s.tc %} · {{ s.tc }}{% endif %}</div>
+        {% if s.file %}<div class="file">{{ s.file }}</div>{% endif %}
+        {% set chips = namespace(items=[]) %}
+        {% for k in ['M1','M2','M5','M6','M4','M8'] %}
+          {% set m = (s.macros or {}).get(k) %}
+          {% set st = m.get('status') if m else 'not_run' %}
+          {% set v = m.get('value') if m else none %}
+          {% if st == 'resolved' and v and v != 'none' %}
+            {% if k == 'M6' %}{% set t = v|upper|replace('_', ' ') %}
+            {% elif k == 'M4' %}{% set t = {'sot': 'SOT', 'broll': 'B-ROLL'}.get(v, v|upper) %}
+            {% elif k == 'M8' %}{% set t = ('dup of ' ~ m.get('of', '')) if v == 'dup' else ('near ' ~ m.get('of', '')) %}
+            {% else %}{% set t = v %}{% endif %}
+          {% elif st == 'unresolved' and k != 'M8' %}{% set t = '?' %}
+          {% elif st == 'needs_scan' and k != 'M8' %}{% set t = 'PENDING' %}
+          {% else %}{% set t = none %}{% endif %}
+          {% if t %}{% set chips.items = chips.items + [t] %}{% endif %}
+        {% endfor %}
+        {% if chips.items %}<div class="chips">{{ chips.items|join(' · ') }}</div>{% endif %}
+        {% if s.facts %}<div class="desc">{{ s.facts }}</div>{% endif %}
+        {% if s.desc %}<div class="desc">{{ s.desc }}</div>{% endif %}
+        {% if s.snd_in %}<div class="snd"><b class="in">IN:</b> {{ s.snd_in }}</div>{% endif %}
+        {% if s.snd_off %}<div class="snd"><b class="off">OFF:</b> {{ s.snd_off }}</div>{% endif %}
+        {% if s.snd_beat %}<div class="snd"><b class="beat">BEAT:</b> {{ s.snd_beat }}</div>{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endfor %}
+
+</body></html>

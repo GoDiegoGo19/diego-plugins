@@ -1,0 +1,694 @@
+{
+  "version": 1,
+  "_note": "Starting values only. Thresholds get tuned on Diego's real drives; change them here, never in the scripts.",
+  "keyframes": {
+    "points": [
+      [
+        "HEAD",
+        0.15
+      ],
+      [
+        "MID",
+        0.6
+      ]
+    ],
+    "tail": [
+      "TAIL",
+      0.85
+    ],
+    "tail_min_s": 12
+  },
+  "M1_shot_size": {
+    "face_cu": 0.3,
+    "face_mcu": 0.12,
+    "person_ms": 0.4
+  },
+  "M2_motion": {
+    "static_max_diff": 6.0,
+    "min_shot_s": 0.6,
+    "sample_offset_s": 0.25,
+    "edge_pad_s": 0.05
+  },
+  "M3_speech": {
+    "speech_min_pct": 40,
+    "frame_ms": 30,
+    "aggressiveness": 2,
+    "max_audio_s": 60,
+    "sample_window_s": 10,
+    "sample_points": [
+      0.15,
+      0.4,
+      0.6,
+      0.85
+    ]
+  },
+  "M4_role": {
+    "sot_min_s": 20,
+    "broll_max_s": 12
+  },
+  "M5_light": {
+    "night_max_brightness": 60,
+    "day_min_brightness": 110
+  },
+  "M6_text": {
+    "lower_third_min_y": 0.62,
+    "slate_words": [
+      "camera",
+      "cam",
+      "director",
+      "dir",
+      "prod",
+      "date",
+      "dp",
+      "sound",
+      "fps",
+      "roll"
+    ],
+    "card_min_chars": 12,
+    "slate_strong_words": [
+      "scene",
+      "take",
+      "slate"
+    ],
+    "slate_min_weak": 2,
+    "lower_frac": 0.7,
+    "above_y": 0.45,
+    "card_max_lower_frac": 0.5,
+    "min_word_len": 3,
+    "min_word_conf": 80,
+    "min_words": 1
+  },
+  "M7_tags": {
+    "words": [
+      "drone",
+      "aerial",
+      "beach",
+      "crowd",
+      "interview",
+      "product",
+      "car",
+      "sunset",
+      "night",
+      "food",
+      "city street",
+      "forest"
+    ],
+    "min_score": 0.25
+  },
+  "M8_dupes": {
+    "dup_max_hamming": 4,
+    "near_max_hamming": 10,
+    "min_bits": 2,
+    "max_bits": 62
+  },
+  "flat": {
+    "min_busyness": 15
+  },
+  "witness": {
+    "ssd_min_score": 0.45,
+    "ocr_min_conf": 60
+  },
+  "W5_simulant_words": [
+    "manikin",
+    "mannequin",
+    "simulator",
+    "patient",
+    "infant",
+    "baby",
+    "classroom",
+    "clinic",
+    "hospital",
+    "turnout",
+    "scba",
+    "hazmat"
+  ],
+  "machine": {
+    "skill": "261113-watch-video",
+    "required": [
+      "python",
+      "ffmpeg",
+      "tesseract",
+      "pango",
+      "poppler",
+      "weasyprint",
+      "opencv"
+    ],
+    "optional": [
+      "webrtcvad",
+      "scenedetect"
+    ],
+    "_note": "Pieces this skill needs on the machine it runs on (p0_machine.py). Skill-specific: not a shared engine key."
+  },
+  "vision": {
+    "_note": "v16 \u00b7 stitched from proven libraries (build plan reports/261108-2000). Weights are INSTALLED on first run by huggingface_hub at the pinned revisions below, checked by sha256, then used offline (HF_HUB_OFFLINE=1); none ship in the skill. Groups: core = quick pass; eyes / faces_text = quick pass when installed; captions / speech = overnight pass. Edit the word lists in axes freely: tag fingerprints rebuild automatically.",
+    "packages": {
+      "python": "3.12",
+      "mac_intel": [
+        "onnxruntime==1.23.2"
+      ],
+      "mac_silicon": [
+        "onnxruntime==1.31.1"
+      ],
+      "linux_box": [
+        "onnxruntime==1.23.2"
+      ],
+      "all": [
+        "scenedetect[opencv-headless]==0.6.7",
+        "opencv-python-headless==4.14.0.94",
+        "ruptures==1.1.10",
+        "scipy==1.18.1",
+        "numpy==2.5.4",
+        "pillow==13.0.0",
+        "tokenizers==0.23.3",
+        "huggingface_hub==2.4.0",
+        "faster-whisper==1.2.1",
+        "rapidocr==3.10.0",
+        "weasyprint==70.0",
+        "jinja2==3.1.6",
+        "sqlite-vec==0.1.9",
+        "scikit-learn==1.9.1",
+        "pandas==3.1.1",
+        "jsonschema==4.26.0"
+      ],
+      "_note": "Install with pip --only-binary=:all: into the skill's own venv. One OpenCV only (headless, <5: the shared engine needs readNetFromCaffe). No PyTorch. Intel Macs: Homebrew no longer has bottles, so Python comes from python.org or uv (reports/261108-1900). bertopic is installed with --no-deps (its default pulls PyTorch via sentence-transformers); it imports and runs on our own fingerprints.",
+      "no_deps": [
+        "bertopic==0.17.4"
+      ]
+    },
+    "tools": {
+      "llama_cpp": {
+        "role": "runs the caption model (llama-mtmd-cli)",
+        "release": "b12207",
+        "licence": "MIT",
+        "mac_intel": {
+          "url": "https://github.com/ggml-org/llama.cpp/releases/download/b12207/llama-b12207-bin-macos-x64.tar.gz",
+          "bytes": 12455011,
+          "sha256": "2398476ef7ee814becab7d16592a15a94e41bee13ef1e84d5c0748d9b8d6402d"
+        },
+        "mac_silicon": {
+          "url": "https://github.com/ggml-org/llama.cpp/releases/download/b12207/llama-b12207-bin-macos-arm64.tar.gz",
+          "bytes": 16708806,
+          "sha256": "1faf4a630ad03816128266ac0e58e70c70a6886d2483f3ccaa3c4d95c37640f5"
+        }
+      }
+    },
+    "models": {
+      "clip": {
+        "group": "core",
+        "role": "tags from word lists (CLIP ViT-B/32 int8)",
+        "repo": "Xenova/clip-vit-base-patch32",
+        "revision": "6b7c523703ae26e39be4b03774966f8571c7f523",
+        "licence": "MIT",
+        "files": [
+          {
+            "file": "onnx/vision_model_quantized.onnx",
+            "bytes": 89117001,
+            "sha256": "583fd1110a514667812fee7d684952aaf82a99b959760c8d7dca7e0ab9839299"
+          },
+          {
+            "file": "onnx/text_model_quantized.onnx",
+            "bytes": 64504507,
+            "sha256": "73baab855d406190da9faa498cfedf65f15cf309f4cc7385b7b032e6d08e5c3a"
+          },
+          {
+            "file": "tokenizer.json",
+            "bytes": 2224119,
+            "sha256": "f7f3b7af117d467b58374797691a6438d3e6b9e9cef800dfd5dced7f697a90cd"
+          },
+          {
+            "file": "preprocessor_config.json",
+            "bytes": 520,
+            "sha256": "6f638fb9401a6d6296feff533ee7efe657b787c49f954f82f5906b36ef2a1b1f"
+          }
+        ]
+      },
+      "dino_small": {
+        "group": "core",
+        "role": "look-alike fingerprints (DINOv2-small int8, CLS)",
+        "repo": "Xenova/dinov2-small",
+        "revision": "c2bb04a51fab207c420665f1946016107bffc701",
+        "licence": "Apache-2.0",
+        "files": [
+          {
+            "file": "onnx/model_quantized.onnx",
+            "bytes": 24451943,
+            "sha256": "3afdc8bc63b50558d6e5770f5b799bb82455c2311183a2de43803f343a29d917"
+          },
+          {
+            "file": "preprocessor_config.json",
+            "bytes": 436,
+            "sha256": "14e780d86fa1861f8751f868d7f45425b5feb55c38ca26f152ca5097ab30f828"
+          }
+        ]
+      },
+      "yolox_s": {
+        "group": "core",
+        "role": "people per frame (YOLOX-S, 640x640)",
+        "url": "https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_s.onnx",
+        "revision": "0.1.1rc0",
+        "licence": "Apache-2.0",
+        "files": [
+          {
+            "file": "yolox_s.onnx",
+            "bytes": 35858002,
+            "sha256": "c5c2d13e59ae883e6af3b45daea64af4833a4951c92d116ec270d9ddbe998063"
+          }
+        ]
+      },
+      "siglip2_vision": {
+        "group": "eyes",
+        "role": "tags challenger (SigLIP 2 base, vision fp32: the int8 graph uses ConvInteger, which onnxruntime CPU cannot run)",
+        "repo": "onnx-community/siglip2-base-patch16-224-ONNX",
+        "revision": "ba1f3b0843f24bc5417d38e19c37b287d719b2f4",
+        "licence": "Apache-2.0 (google/siglip2)",
+        "files": [
+          {
+            "file": "onnx/vision_model.onnx",
+            "bytes": 371807752,
+            "sha256": "c0573e3f4140c3a7c4e9cc5912bd6b26a033b46a6a8e8af26cbea262b163bcad"
+          }
+        ]
+      },
+      "siglip2_text": {
+        "group": "eyes",
+        "role": "tags challenger (SigLIP 2 base, text int8 + tokenizer)",
+        "repo": "onnx-community/siglip2-base-patch16-224-ONNX",
+        "revision": "ba1f3b0843f24bc5417d38e19c37b287d719b2f4",
+        "licence": "Apache-2.0 (google/siglip2)",
+        "files": [
+          {
+            "file": "onnx/text_model_int8.onnx",
+            "bytes": 283438275,
+            "sha256": "3a0603d3a00c05a80a6ded4743c16aaac7b1e62cdcc7e362e7ce418659b96400"
+          },
+          {
+            "file": "tokenizer.json",
+            "bytes": 34363039,
+            "sha256": "cb9140fae3ac5122c972d37adf83e1248471a38147ad76f8215c8872c6fd8322"
+          },
+          {
+            "file": "preprocessor_config.json",
+            "bytes": 394,
+            "sha256": "9b36b57ebaf20f09bf4c22100ccc21877ea6bfe5aead0c00c59f8af8ccefacfc"
+          },
+          {
+            "file": "config.json",
+            "bytes": 435,
+            "sha256": "e43a9f7692d3819886a82cb2097048258d444f123c67d37ec825f9345b019cf2"
+          }
+        ]
+      },
+      "dinov2_base": {
+        "group": "eyes",
+        "role": "sharper look-alike fingerprints (DINOv2-base fp32, CLS)",
+        "repo": "Xenova/dinov2-base",
+        "revision": "d623d125a29e343851bcedff293fdc8b6bda292b",
+        "licence": "Apache-2.0",
+        "files": [
+          {
+            "file": "onnx/model.onnx",
+            "bytes": 346555570,
+            "sha256": "de9c675d214f0171285f90f1d1d7716bce1c5e280e93826d071d57f7b9314d98"
+          },
+          {
+            "file": "preprocessor_config.json",
+            "bytes": 436,
+            "sha256": "14e780d86fa1861f8751f868d7f45425b5feb55c38ca26f152ca5097ab30f828"
+          }
+        ]
+      },
+      "transnetv2": {
+        "group": "eyes",
+        "role": "neural shot cuts (TransNetV2, second opinion beside PySceneDetect)",
+        "repo": "elya5/transnetv2",
+        "revision": "e1cfcb717af91e41ffb84b5fd851505682c576ee",
+        "licence": "mit",
+        "files": [
+          {
+            "file": "transnetv2.onnx",
+            "bytes": 31250929,
+            "sha256": "c4d54a682bace32f25136ef83ca2c9d403e8f8193775efeb995172a0d95a8e0c"
+          }
+        ]
+      },
+      "smolvlm2": {
+        "group": "captions",
+        "role": "one sentence per segment hero frame (SmolVLM2-2.2B via llama.cpp)",
+        "repo": "ggml-org/SmolVLM2-2.2B-Instruct-GGUF",
+        "revision": "1bc3c9f74ceafd4c8d4411cc9cf188bba3798f91",
+        "licence": "apache-2.0",
+        "files": [
+          {
+            "file": "SmolVLM2-2.2B-Instruct-Q4_K_M.gguf",
+            "bytes": 1112602656,
+            "sha256": "0cf76814555b8665149075b74ab6b5c1d428ea1d3d01c1918c12012e8d7c9f58"
+          },
+          {
+            "file": "mmproj-SmolVLM2-2.2B-Instruct-f16.gguf",
+            "bytes": 872303680,
+            "sha256": "db9a3a1648cab1ebc3af4a2b0c8145dd8faebf6f7dd7b16e7dc1842229f14ac4"
+          }
+        ]
+      },
+      "yunet": {
+        "group": "faces_text",
+        "role": "face boxes (OpenCV FaceDetectorYN)",
+        "repo": "opencv/face_detection_yunet",
+        "revision": "3cc26e7f1014a5ee5d74a42acee58bafc9d0a310",
+        "licence": "MIT (OpenCV zoo)",
+        "files": [
+          {
+            "file": "face_detection_yunet_2023mar.onnx",
+            "bytes": 232589,
+            "sha256": "8f2383e4dd3cfbb4553ea8718107fc0423210dc964f9f4280604804ed2552fa4"
+          }
+        ]
+      },
+      "sface": {
+        "group": "faces_text",
+        "role": "same person across clips (OpenCV FaceRecognizerSF)",
+        "repo": "opencv/face_recognition_sface",
+        "revision": "3d7082438a6e4551e840c9b2bb60b71e8da4b524",
+        "licence": "Apache-2.0 (OpenCV zoo)",
+        "files": [
+          {
+            "file": "face_recognition_sface_2021dec.onnx",
+            "bytes": 38696353,
+            "sha256": "0ba9fbfa01b5270c96627c4ef784da859931e02f04419c829e83484087c34e79"
+          }
+        ]
+      },
+      "whisper_turbo": {
+        "group": "speech",
+        "role": "transcripts on ticked clips only (faster-whisper; Silero VAD bundled)",
+        "repo": "mobiuslabsgmbh/faster-whisper-large-v3-turbo",
+        "revision": "0a363e9161cbc7ed1431c9597a8ceaf0c4f78fcf",
+        "licence": "mit",
+        "files": [
+          {
+            "file": "model.bin",
+            "bytes": 1617884929,
+            "sha256": "e76620f83d5f5b69efd3d87e3dc180c1bd21df9fbebacfd4335e5e1efcc018da"
+          },
+          {
+            "file": "config.json",
+            "bytes": 2263,
+            "sha256": "b0253ea6c0d3bea6b1e19e91a02acfd3b53f4467362efcb5a3e6b16c9b3a9b7e"
+          },
+          {
+            "file": "tokenizer.json",
+            "bytes": 2710337,
+            "sha256": "297b13372ac43916285644fb9687add3cc62ee2a1adb60da3dc25cc94c1871fd"
+          },
+          {
+            "file": "vocabulary.json",
+            "bytes": 1068114,
+            "sha256": "c69260f2ab26d659b7c398f9a2b2b48ed0df16c3b47d7326782fd9cba71690c1"
+          },
+          {
+            "file": "preprocessor_config.json",
+            "bytes": 340,
+            "sha256": "7ccc62c6f2765af1f3b46c00c9b5894426835a05021c8b9c01eecb6dfb542711"
+          }
+        ]
+      },
+      "siglip2_so400m": {
+        "group": "eyes",
+        "role": "tags, strongest (SigLIP 2 So400m-384; vision fp32, text int8; one model file each side)",
+        "repo": "onnx-community/siglip2-so400m-patch14-384-ONNX",
+        "revision": "8ecf3f2bbb135bec33f4bb721c11479bf6a8a254",
+        "licence": "Apache-2.0 (google/siglip2)",
+        "files": [
+          {
+            "file": "onnx/vision_model.onnx",
+            "bytes": 1713485119,
+            "sha256": "7ca661a08aa82a00649bf17bd57673eba8abfeef7f14dc8ed4d297bf47695da5"
+          },
+          {
+            "file": "onnx/text_model_int8.onnx",
+            "bytes": 711126655,
+            "sha256": "3423f71ad99e102bf3c389fb0ebafd181faec6dedef9e28ddf17ecc6852e0397"
+          },
+          {
+            "file": "tokenizer.json",
+            "bytes": 34363039,
+            "sha256": "cb9140fae3ac5122c972d37adf83e1248471a38147ad76f8215c8872c6fd8322"
+          },
+          {
+            "file": "preprocessor_config.json",
+            "bytes": 394,
+            "sha256": "fb2817d3523ca3b666c859f15320c7138416bc38ffc515e2963f78c868c51c90"
+          }
+        ]
+      },
+      "minilm": {
+        "group": "core",
+        "role": "text fingerprints for search (all-MiniLM-L6-v2 int8; fastembed failed its gate, R14)",
+        "repo": "Xenova/all-MiniLM-L6-v2",
+        "revision": "751bff37182d3f1213fa05d7196b954e230abad9",
+        "licence": "Apache-2.0",
+        "files": [
+          {
+            "file": "onnx/model_quantized.onnx",
+            "bytes": 22972370,
+            "sha256": "afdb6f1a0e45b715d0bb9b11772f032c399babd23bfc31fed1c170afc848bdb1"
+          },
+          {
+            "file": "tokenizer.json",
+            "bytes": 711661,
+            "sha256": "da0e79933b9ed51798a3ae27893d3c5fa4a201126cef75586296df9b4d2c62a0"
+          }
+        ]
+      }
+    },
+    "choose": {
+      "tagger": "clip",
+      "fingerprint": "dino_small",
+      "quick_tagger": "clip",
+      "_note": "Which installed model does each job. siglip2_vision (base) and siglip2_so400m are challengers: switch only after they win on TEST_DRIVE_v1 (scored, step 6)."
+    },
+    "sample": {
+      "overview_max": 90,
+      "overview_every_s": 2.0,
+      "cut_fps": 3,
+      "timeout_s": 300,
+      "_note": "Overview: real frames decoded at real timestamps spread over the WHOLE clip (actual PTS recorded), max overview_max. Cuts: PySceneDetect on a low-res stream at cut_fps."
+    },
+    "cuts": {
+      "detector": "AdaptiveDetector",
+      "second_opinion": "transnetv2",
+      "transnet_threshold": 0.5
+    },
+    "regimes": {
+      "method": "ruptures.Pelt",
+      "model": "l2",
+      "jump": 1,
+      "min_samples": 2,
+      "penalty": 3.0,
+      "_note": "Inside each shot, on normalized fingerprints. min_samples counts samples, not seconds. A shot cut is always a boundary; the minimum never erases one. Penalty to be tuned on TEST_DRIVE_v1."
+    },
+    "family": {
+      "join_above": 0.82,
+      "passes": 3,
+      "frozen_pass": true,
+      "min_compactness": 0.75,
+      "_note": "Leader walk in drive order, then a frozen-centroid reassignment, then a compactness check (a member below min_compactness to its centre leaves as a singleton). No chain merges."
+    },
+    "dark_luma": 20,
+    "people_min_score": 0.45,
+    "axes": {
+      "content": {
+        "min_prob": 0.35,
+        "labels": {
+          "interview": [
+            "a person sitting and talking to an interviewer",
+            "a seated interview with one person",
+            "a talking head interview"
+          ],
+          "portrait": [
+            "a portrait of one person looking at the camera"
+          ],
+          "sport": [
+            "people playing a sport",
+            "an athlete in action"
+          ],
+          "people b-roll": [
+            "people walking and doing things",
+            "a group of people",
+            "people working together"
+          ],
+          "aerial": [
+            "an aerial drone shot looking down at the ground",
+            "an aerial view of land from high above"
+          ],
+          "driving": [
+            "a view from inside a moving car",
+            "a road seen through a car windshield",
+            "a car driving on a road"
+          ],
+          "landscape": [
+            "a landscape with mountains, fields or sea",
+            "nature scenery",
+            "a wide view of a natural landscape"
+          ],
+          "city street": [
+            "a city street with buildings",
+            "an urban street scene"
+          ],
+          "interior room": [
+            "the inside of an empty room",
+            "an interior of a building"
+          ],
+          "medical": [
+            "surgeons in a hospital operating room",
+            "a medical procedure",
+            "doctors in scrubs"
+          ],
+          "animal": [
+            "an animal",
+            "farm animals",
+            "a wild animal"
+          ],
+          "hands and detail": [
+            "a close up of hands doing something",
+            "a detail close up of an object"
+          ],
+          "slate": [
+            "a film clapperboard slate",
+            "a person holding a clapperboard"
+          ],
+          "screen or text": [
+            "a computer screen",
+            "text and graphics on a plain background",
+            "a phone screen"
+          ],
+          "blank": [
+            "a black frame",
+            "a blank grey frame",
+            "a blurry out of focus frame"
+          ]
+        }
+      },
+      "shot": {
+        "min_prob": 0.4,
+        "labels": {
+          "wide": [
+            "a wide shot showing a whole scene",
+            "an establishing wide shot"
+          ],
+          "medium": [
+            "a medium shot of a person from the waist up"
+          ],
+          "close-up": [
+            "a close up shot of a face",
+            "a close up shot"
+          ],
+          "extreme close-up": [
+            "an extreme close up macro shot"
+          ]
+        }
+      },
+      "light": {
+        "min_prob": 0.5,
+        "labels": {
+          "day exterior": [
+            "a photo taken outdoors in daylight",
+            "an outdoor scene under the sky during the day"
+          ],
+          "night exterior": [
+            "a photo taken outdoors at night",
+            "a dark night scene outside with lights"
+          ],
+          "interior": [
+            "a photo taken indoors inside a room",
+            "an indoor scene with walls and a ceiling"
+          ]
+        }
+      }
+    },
+    "faces": {
+      "min_score": 0.8,
+      "same_person_above": 0.363,
+      "_note": "SFace cosine threshold from OpenCV's own sample (0.363)."
+    },
+    "ocr": {
+      "min_conf": 0.8,
+      "min_len": 3
+    },
+    "speech": {
+      "run_on": [
+        "likely",
+        "possible"
+      ],
+      "transcribe": "ticked clips only",
+      "language": null
+    },
+    "captions": {
+      "prompt": "Describe this video frame in one short sentence: who or what is in it, what is happening, and the shot size.",
+      "max_tokens": 60,
+      "threads": 0
+    },
+    "tagging": {
+      "clip": {
+        "scale": 100.0
+      },
+      "siglip": {
+        "scale": 50.0,
+        "_note": "SigLIP's learned scale/bias are not in the split ONNX files (R16): uncalibrated softmax over cosine x scale, thresholds validated on the test drive."
+      }
+    },
+    "search": {
+      "db": "<catalog>/catalog_objects.sqlite",
+      "tables": [
+        "image_vec",
+        "text_vec",
+        "text_fts"
+      ],
+      "merge": "reciprocal rank fusion, k=60"
+    },
+    "topics": {
+      "min_text_words": 5,
+      "pca_dims": 50,
+      "min_cluster_size": 2,
+      "top_words": 5
+    },
+    "clockwork": {
+      "workers": "auto",
+      "max_workers": 8,
+      "queue_per_worker": 2,
+      "heavy_workers": 1,
+      "mem_gb_per_worker": 3,
+      "_note": "Bounded pool per gear: workers = min(max_workers, cores/2, memory/mem_gb_per_worker); heavy gears (So400m, captions, Whisper) get heavy_workers. At most workers x queue_per_worker clips in flight."
+    },
+    "brackets": {
+      "quick": {
+        "label": "Quick \u00b7 0-5 min",
+        "depth": [
+          0,
+          1
+        ],
+        "tagger": "quick_tagger"
+      },
+      "standard": {
+        "label": "Standard \u00b7 10-15 min",
+        "depth": [
+          2
+        ]
+      },
+      "full": {
+        "label": "Full \u00b7 ~30 min",
+        "depth": [
+          3
+        ]
+      },
+      "overnight": {
+        "label": "Overnight \u00b7 hours",
+        "depth": [
+          4,
+          5,
+          6
+        ]
+      }
+    }
+  }
+}

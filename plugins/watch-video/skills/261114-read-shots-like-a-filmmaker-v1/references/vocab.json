@@ -1,0 +1,10 @@
+{
+  "_note": "Controlled lists a person can extend (Sexton, editors_eye_shot_grammar.md section 2). Add a word to a list to admit it; shot_ledger.py validate reads this file. Nouns are head nouns only (one word); verbs are lemmas (one word). New words join only when a person adds them.",
+  "nouns": ["couple", "man", "woman", "child", "children", "family", "group", "crowd", "hands", "face", "dog", "cat", "horse", "bird",
+            "car", "truck", "boat", "plane", "bicycle", "house", "building", "street", "road", "city", "skyline", "landscape", "field",
+            "forest", "beach", "sea", "sky", "sun", "water", "tree", "flower", "food", "table", "screen", "phone", "laptop", "doctor",
+            "nurse", "patient", "worker", "athlete", "dancer", "musician", "teenager", "baby", "person", "people", "object", "product", "text"],
+  "verbs": ["walk", "run", "stand", "sit", "lie", "embrace", "kiss", "dance", "talk", "look", "swim", "drive", "ride", "work", "sway",
+            "turn", "wave", "laugh", "cry", "eat", "drink", "cook", "play", "read", "write", "type", "hold", "carry", "climb", "jump",
+            "fall", "fly", "float", "move", "wait", "sleep", "smile", "point", "shake", "pour", "open", "close", "cross", "pass", "rest"]
+}

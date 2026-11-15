@@ -1,0 +1,389 @@
+{
+ "_fixture": "watch_see.py TEST_DRIVE_v1 --bracket quick --no-sheet, 261114; IDs and times only (paths, tags, vectors dropped)",
+ "schema": "watch-see/1",
+ "id_rule": "clip_id = <drive>/<card column>/<file name> (ppf_ingest); segment_id = <clip_id>#S<nn>",
+ "drive": "TEST_DRIVE_v1",
+ "bracket": "quick",
+ "clips": [
+  {
+   "clip_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/AERIAL_DJI/DJI_0001.MP4",
+   "drive": "TEST_DRIVE_v1",
+   "card": "AERIAL_DJI",
+   "card_column": "260901_SHOOT_DAY_1/AERIAL_DJI",
+   "day": "260901",
+   "clip": "DJI_0001.MP4",
+   "rel_path": "260901_SHOOT_DAY_1/AERIAL_DJI/DCIM/100MEDIA/DJI_0001.MP4",
+   "duration_s": 10.01,
+   "fps": 29.97,
+   "status": "seen",
+   "segments": [
+    "TEST_DRIVE_v1/260901_SHOOT_DAY_1/AERIAL_DJI/DJI_0001.MP4#S01"
+   ]
+  },
+  {
+   "clip_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/AERIAL_DJI/DJI_0002.MP4",
+   "drive": "TEST_DRIVE_v1",
+   "card": "AERIAL_DJI",
+   "card_column": "260901_SHOOT_DAY_1/AERIAL_DJI",
+   "day": "260901",
+   "clip": "DJI_0002.MP4",
+   "rel_path": "260901_SHOOT_DAY_1/AERIAL_DJI/DCIM/100MEDIA/DJI_0002.MP4",
+   "duration_s": 12.012,
+   "fps": 29.97,
+   "status": "seen",
+   "segments": [
+    "TEST_DRIVE_v1/260901_SHOOT_DAY_1/AERIAL_DJI/DJI_0002.MP4#S01",
+    "TEST_DRIVE_v1/260901_SHOOT_DAY_1/AERIAL_DJI/DJI_0002.MP4#S02"
+   ]
+  },
+  {
+   "clip_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/FX6_A001/A001C001_260901AB.MXF",
+   "drive": "TEST_DRIVE_v1",
+   "card": "FX6_A001",
+   "card_column": "260901_SHOOT_DAY_1/FX6_A001",
+   "day": "260901",
+   "clip": "A001C001_260901AB.MXF",
+   "rel_path": "260901_SHOOT_DAY_1/FX6_A001/XDROOT/Clip/A001C001_260901AB.MXF",
+   "duration_s": 12.012,
+   "fps": 23.976,
+   "status": "seen",
+   "segments": [
+    "TEST_DRIVE_v1/260901_SHOOT_DAY_1/FX6_A001/A001C001_260901AB.MXF#S01",
+    "TEST_DRIVE_v1/260901_SHOOT_DAY_1/FX6_A001/A001C001_260901AB.MXF#S02",
+    "TEST_DRIVE_v1/260901_SHOOT_DAY_1/FX6_A001/A001C001_260901AB.MXF#S03"
+   ]
+  },
+  {
+   "clip_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/FX6_A001/A001C002_260901AB.MXF",
+   "drive": "TEST_DRIVE_v1",
+   "card": "FX6_A001",
+   "card_column": "260901_SHOOT_DAY_1/FX6_A001",
+   "day": "260901",
+   "clip": "A001C002_260901AB.MXF",
+   "rel_path": "260901_SHOOT_DAY_1/FX6_A001/XDROOT/Clip/A001C002_260901AB.MXF",
+   "duration_s": 7.007,
+   "fps": 23.976,
+   "status": "seen",
+   "segments": [
+    "TEST_DRIVE_v1/260901_SHOOT_DAY_1/FX6_A001/A001C002_260901AB.MXF#S01"
+   ]
+  },
+  {
+   "clip_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/GH5S_A/P1000001.MOV",
+   "drive": "TEST_DRIVE_v1",
+   "card": "GH5S_A",
+   "card_column": "260901_SHOOT_DAY_1/GH5S_A",
+   "day": "260901",
+   "clip": "P1000001.MOV",
+   "rel_path": "260901_SHOOT_DAY_1/GH5S_A/DCIM/100_PANA/P1000001.MOV",
+   "duration_s": 8.008,
+   "fps": 23.976,
+   "status": "seen",
+   "segments": [
+    "TEST_DRIVE_v1/260901_SHOOT_DAY_1/GH5S_A/P1000001.MOV#S01"
+   ]
+  },
+  {
+   "clip_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/GH5S_A/P1000002.MOV",
+   "drive": "TEST_DRIVE_v1",
+   "card": "GH5S_A",
+   "card_column": "260901_SHOOT_DAY_1/GH5S_A",
+   "day": "260901",
+   "clip": "P1000002.MOV",
+   "rel_path": "260901_SHOOT_DAY_1/GH5S_A/DCIM/100_PANA/P1000002.MOV",
+   "duration_s": 10.01,
+   "fps": 23.976,
+   "status": "seen",
+   "segments": [
+    "TEST_DRIVE_v1/260901_SHOOT_DAY_1/GH5S_A/P1000002.MOV#S01",
+    "TEST_DRIVE_v1/260901_SHOOT_DAY_1/GH5S_A/P1000002.MOV#S02",
+    "TEST_DRIVE_v1/260901_SHOOT_DAY_1/GH5S_A/P1000002.MOV#S03"
+   ]
+  },
+  {
+   "clip_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/P2_A001/0001AB.MXF",
+   "drive": "TEST_DRIVE_v1",
+   "card": "P2_A001",
+   "card_column": "260901_SHOOT_DAY_1/P2_A001",
+   "day": "260901",
+   "clip": "0001AB.MXF",
+   "rel_path": "260901_SHOOT_DAY_1/P2_A001/CONTENTS/VIDEO/0001AB.MXF",
+   "duration_s": 6.0,
+   "fps": 25.0,
+   "status": "seen",
+   "segments": [
+    "TEST_DRIVE_v1/260901_SHOOT_DAY_1/P2_A001/0001AB.MXF#S01"
+   ]
+  },
+  {
+   "clip_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/P2_A001/0002AB.MXF",
+   "drive": "TEST_DRIVE_v1",
+   "card": "P2_A001",
+   "card_column": "260901_SHOOT_DAY_1/P2_A001",
+   "day": "260901",
+   "clip": "0002AB.MXF",
+   "rel_path": "260901_SHOOT_DAY_1/P2_A001/CONTENTS/VIDEO/0002AB.MXF",
+   "duration_s": 8.0,
+   "fps": 25.0,
+   "status": "seen",
+   "segments": [
+    "TEST_DRIVE_v1/260901_SHOOT_DAY_1/P2_A001/0002AB.MXF#S01",
+    "TEST_DRIVE_v1/260901_SHOOT_DAY_1/P2_A001/0002AB.MXF#S02"
+   ]
+  },
+  {
+   "clip_id": "TEST_DRIVE_v1/260902_SHOOT_DAY_2/EX1_A/489_0001_01.MP4",
+   "drive": "TEST_DRIVE_v1",
+   "card": "EX1_A",
+   "card_column": "260902_SHOOT_DAY_2/EX1_A",
+   "day": "260902",
+   "clip": "489_0001_01.MP4",
+   "rel_path": "260902_SHOOT_DAY_2/EX1_A/BPAV/CLPR/489_0001_01/489_0001_01.MP4",
+   "duration_s": 7.007,
+   "fps": 29.97,
+   "status": "seen",
+   "segments": [
+    "TEST_DRIVE_v1/260902_SHOOT_DAY_2/EX1_A/489_0001_01.MP4#S01"
+   ]
+  },
+  {
+   "clip_id": "TEST_DRIVE_v1/260902_SHOOT_DAY_2/EX1_A/489_0002_01.MP4",
+   "drive": "TEST_DRIVE_v1",
+   "card": "EX1_A",
+   "card_column": "260902_SHOOT_DAY_2/EX1_A",
+   "day": "260902",
+   "clip": "489_0002_01.MP4",
+   "rel_path": "260902_SHOOT_DAY_2/EX1_A/BPAV/CLPR/489_0002_01/489_0002_01.MP4",
+   "duration_s": 8.008,
+   "fps": 29.97,
+   "status": "seen",
+   "segments": [
+    "TEST_DRIVE_v1/260902_SHOOT_DAY_2/EX1_A/489_0002_01.MP4#S01",
+    "TEST_DRIVE_v1/260902_SHOOT_DAY_2/EX1_A/489_0002_01.MP4#S02"
+   ]
+  }
+ ],
+ "segments": [
+  {
+   "segment_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/AERIAL_DJI/DJI_0001.MP4#S01",
+   "clip_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/AERIAL_DJI/DJI_0001.MP4",
+   "drive": "TEST_DRIVE_v1",
+   "card": "AERIAL_DJI",
+   "clip": "DJI_0001.MP4",
+   "n": 1,
+   "shot": 1,
+   "t_in": 0.0,
+   "t_out": 10.01,
+   "hero_t": 5.005,
+   "family": "F001"
+  },
+  {
+   "segment_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/AERIAL_DJI/DJI_0002.MP4#S01",
+   "clip_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/AERIAL_DJI/DJI_0002.MP4",
+   "drive": "TEST_DRIVE_v1",
+   "card": "AERIAL_DJI",
+   "clip": "DJI_0002.MP4",
+   "n": 1,
+   "shot": 1,
+   "t_in": 0.0,
+   "t_out": 6.006,
+   "hero_t": 4.505,
+   "family": "F001"
+  },
+  {
+   "segment_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/AERIAL_DJI/DJI_0002.MP4#S02",
+   "clip_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/AERIAL_DJI/DJI_0002.MP4",
+   "drive": "TEST_DRIVE_v1",
+   "card": "AERIAL_DJI",
+   "clip": "DJI_0002.MP4",
+   "n": 2,
+   "shot": 2,
+   "t_in": 6.006,
+   "t_out": 12.012,
+   "hero_t": 7.508,
+   "family": "F001"
+  },
+  {
+   "segment_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/FX6_A001/A001C001_260901AB.MXF#S01",
+   "clip_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/FX6_A001/A001C001_260901AB.MXF",
+   "drive": "TEST_DRIVE_v1",
+   "card": "FX6_A001",
+   "clip": "A001C001_260901AB.MXF",
+   "n": 1,
+   "shot": 1,
+   "t_in": 0.0,
+   "t_out": 2.002,
+   "hero_t": 1.502,
+   "family": "F002"
+  },
+  {
+   "segment_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/FX6_A001/A001C001_260901AB.MXF#S02",
+   "clip_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/FX6_A001/A001C001_260901AB.MXF",
+   "drive": "TEST_DRIVE_v1",
+   "card": "FX6_A001",
+   "clip": "A001C001_260901AB.MXF",
+   "n": 2,
+   "shot": 2,
+   "t_in": 2.002,
+   "t_out": 7.007,
+   "hero_t": 4.505,
+   "family": "F003"
+  },
+  {
+   "segment_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/FX6_A001/A001C001_260901AB.MXF#S03",
+   "clip_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/FX6_A001/A001C001_260901AB.MXF",
+   "drive": "TEST_DRIVE_v1",
+   "card": "FX6_A001",
+   "clip": "A001C001_260901AB.MXF",
+   "n": 3,
+   "shot": 3,
+   "t_in": 7.007,
+   "t_out": 12.012,
+   "hero_t": 7.508,
+   "family": "F001"
+  },
+  {
+   "segment_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/FX6_A001/A001C002_260901AB.MXF#S01",
+   "clip_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/FX6_A001/A001C002_260901AB.MXF",
+   "drive": "TEST_DRIVE_v1",
+   "card": "FX6_A001",
+   "clip": "A001C002_260901AB.MXF",
+   "n": 1,
+   "shot": 1,
+   "t_in": 0.0,
+   "t_out": 7.007,
+   "hero_t": 5.255,
+   "family": "F004"
+  },
+  {
+   "segment_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/GH5S_A/P1000001.MOV#S01",
+   "clip_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/GH5S_A/P1000001.MOV",
+   "drive": "TEST_DRIVE_v1",
+   "card": "GH5S_A",
+   "clip": "P1000001.MOV",
+   "n": 1,
+   "shot": 1,
+   "t_in": 0.0,
+   "t_out": 8.008,
+   "hero_t": 4.004,
+   "family": "F005"
+  },
+  {
+   "segment_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/GH5S_A/P1000002.MOV#S01",
+   "clip_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/GH5S_A/P1000002.MOV",
+   "drive": "TEST_DRIVE_v1",
+   "card": "GH5S_A",
+   "clip": "P1000002.MOV",
+   "n": 1,
+   "shot": 1,
+   "t_in": 0.0,
+   "t_out": 4.004,
+   "hero_t": 1.668,
+   "family": "F006"
+  },
+  {
+   "segment_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/GH5S_A/P1000002.MOV#S02",
+   "clip_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/GH5S_A/P1000002.MOV",
+   "drive": "TEST_DRIVE_v1",
+   "card": "GH5S_A",
+   "clip": "P1000002.MOV",
+   "n": 2,
+   "shot": 2,
+   "t_in": 4.004,
+   "t_out": 6.006,
+   "hero_t": 5.005,
+   "family": "F007"
+  },
+  {
+   "segment_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/GH5S_A/P1000002.MOV#S03",
+   "clip_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/GH5S_A/P1000002.MOV",
+   "drive": "TEST_DRIVE_v1",
+   "card": "GH5S_A",
+   "clip": "P1000002.MOV",
+   "n": 3,
+   "shot": 3,
+   "t_in": 6.006,
+   "t_out": 10.01,
+   "hero_t": 8.342,
+   "family": "F005"
+  },
+  {
+   "segment_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/P2_A001/0001AB.MXF#S01",
+   "clip_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/P2_A001/0001AB.MXF",
+   "drive": "TEST_DRIVE_v1",
+   "card": "P2_A001",
+   "clip": "0001AB.MXF",
+   "n": 1,
+   "shot": 1,
+   "t_in": 0.0,
+   "t_out": 6.0,
+   "hero_t": 1.52,
+   "family": "F003"
+  },
+  {
+   "segment_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/P2_A001/0002AB.MXF#S01",
+   "clip_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/P2_A001/0002AB.MXF",
+   "drive": "TEST_DRIVE_v1",
+   "card": "P2_A001",
+   "clip": "0002AB.MXF",
+   "n": 1,
+   "shot": 1,
+   "t_in": 0.0,
+   "t_out": 5.0,
+   "hero_t": 2.0,
+   "family": "F006"
+  },
+  {
+   "segment_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/P2_A001/0002AB.MXF#S02",
+   "clip_id": "TEST_DRIVE_v1/260901_SHOOT_DAY_1/P2_A001/0002AB.MXF",
+   "drive": "TEST_DRIVE_v1",
+   "card": "P2_A001",
+   "clip": "0002AB.MXF",
+   "n": 2,
+   "shot": 2,
+   "t_in": 5.0,
+   "t_out": 8.0,
+   "hero_t": 6.0,
+   "family": "F002"
+  },
+  {
+   "segment_id": "TEST_DRIVE_v1/260902_SHOOT_DAY_2/EX1_A/489_0001_01.MP4#S01",
+   "clip_id": "TEST_DRIVE_v1/260902_SHOOT_DAY_2/EX1_A/489_0001_01.MP4",
+   "drive": "TEST_DRIVE_v1",
+   "card": "EX1_A",
+   "clip": "489_0001_01.MP4",
+   "n": 1,
+   "shot": 1,
+   "t_in": 0.0,
+   "t_out": 7.007,
+   "hero_t": 1.768,
+   "family": "F006"
+  },
+  {
+   "segment_id": "TEST_DRIVE_v1/260902_SHOOT_DAY_2/EX1_A/489_0002_01.MP4#S01",
+   "clip_id": "TEST_DRIVE_v1/260902_SHOOT_DAY_2/EX1_A/489_0002_01.MP4",
+   "drive": "TEST_DRIVE_v1",
+   "card": "EX1_A",
+   "clip": "489_0002_01.MP4",
+   "n": 1,
+   "shot": 1,
+   "t_in": 0.0,
+   "t_out": 4.004,
+   "hero_t": 1.335,
+   "family": "F003"
+  },
+  {
+   "segment_id": "TEST_DRIVE_v1/260902_SHOOT_DAY_2/EX1_A/489_0002_01.MP4#S02",
+   "clip_id": "TEST_DRIVE_v1/260902_SHOOT_DAY_2/EX1_A/489_0002_01.MP4",
+   "drive": "TEST_DRIVE_v1",
+   "card": "EX1_A",
+   "clip": "489_0002_01.MP4",
+   "n": 2,
+   "shot": 2,
+   "t_in": 4.004,
+   "t_out": 8.008,
+   "hero_t": 4.004,
+   "family": "F004"
+  }
+ ]
+}

@@ -1,0 +1,75 @@
+{
+ "name": "best",
+ "says": [
+  "best",
+  "the best",
+  "top",
+  "strongest",
+  "most dynamic"
+ ],
+ "inherits": null,
+ "hard": [
+  "base floor: no hard faults",
+  "length >= need",
+  "orientation matches deliverable",
+  "licence allowed for the use"
+ ],
+ "weights": [
+  {
+   "slider": "energy",
+   "weight": 0.3,
+   "why": "the best ones equal the most dynamic (Diego, Q020)"
+  },
+  {
+   "slider": "purpose",
+   "weight": 0.2,
+   "why": "one clear central visual point"
+  },
+  {
+   "slider": "contrast",
+   "weight": 0.15,
+   "why": "some level of contrast"
+  },
+  {
+   "slider": "layers",
+   "weight": 0.15,
+   "why": "depth, foreground to background"
+  },
+  {
+   "slider": "cinematic",
+   "weight": 0.1,
+   "why": "light and lens with intent"
+  },
+  {
+   "slider": "believable",
+   "weight": 0.05,
+   "why": "an audience has to buy it"
+  },
+  {
+   "slider": "production",
+   "weight": 0.05,
+   "why": "the easy solve (high-end camera, high PV) counts, but least"
+  }
+ ],
+ "switches": {
+  "cap_staged_obvious": true
+ },
+ "tie_break": [
+  "emotion",
+  "believability",
+  "novelty_in_pool",
+  "handles",
+  "fewer_flags",
+  "licence"
+ ],
+ "must_cite": [
+  "arc_shape",
+  "arc_energy",
+  "framing_point",
+  "lighting_ratio_or_levels",
+  "depth"
+ ],
+ "edited_by": "Sexton (editor's eye) with Palmer's research as check; Diego to tune",
+ "date": "261114",
+ "note": "Starting points to tune on Diego's blind picks. A weight change with no why is refused. Counts never become a slider."
+}

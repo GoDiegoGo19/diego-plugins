@@ -1,0 +1,22 @@
+{
+  "name": "premiere-project-file-assembly",
+  "displayName": "Premiere Project File Assembly (go Diego go)",
+  "version": "2.3.0",
+  "description": "Writes Premiere project files from a conversation, a new version each time. Scan data or a media folder becomes bins 00-05, per-card stringouts, INTERVIEWS/BROLL, timecode sync; a small model inside (MiniLM) organizes B-roll by topic, every take of a line, and selects from notes. iPhone footage handled (creation date, slo-mo, vertical, HDR, approximate sync). Writes .prproj with our own prwrite library; xmeml as last resort. Verified by reparse; unopened in Premiere.",
+  "author": {
+    "name": "Diego"
+  },
+  "repository": "https://github.com/GoDiegoGo19/Diego-work",
+  "keywords": [
+    "assembly",
+    "multicam",
+    "premiere",
+    "project-file",
+    "prproj",
+    "py-premiere",
+    "stringout",
+    "timecode-sync",
+    "xmeml"
+  ],
+  "license": "Apache-2.0"
+}

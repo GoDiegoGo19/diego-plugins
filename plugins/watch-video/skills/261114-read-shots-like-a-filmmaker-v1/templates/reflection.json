@@ -1,0 +1,64 @@
+{
+ "name": "reflection",
+ "says": [
+  "still",
+  "calm",
+  "mirror",
+  "lake",
+  "quiet"
+ ],
+ "inherits": "best",
+ "hard": [
+  "place in water (lake / river / pond / sea)",
+  "camera_move in locked / slow",
+  "horizon level"
+ ],
+ "weights": [
+  {
+   "slider": "calm",
+   "weight": 0.35,
+   "why": "stillness is the design here (Block: affinity)"
+  },
+  {
+   "slider": "purpose",
+   "weight": 0.2,
+   "why": "centred-symmetric framing scores highest"
+  },
+  {
+   "slider": "layers",
+   "weight": 0.2,
+   "why": "bird, reflection, far shore, haze"
+  },
+  {
+   "slider": "contrast",
+   "weight": 0.15,
+   "why": "soft, high affinity; a little range keeps it from milky"
+  },
+  {
+   "slider": "cinematic",
+   "weight": 0.1,
+   "why": "golden hour and a locked frame"
+  }
+ ],
+ "switches": {
+  "cap_staged_obvious": true
+ },
+ "tie_break": [
+  "emotion",
+  "believability",
+  "novelty_in_pool",
+  "handles",
+  "fewer_flags",
+  "licence"
+ ],
+ "must_cite": [
+  "camera_move",
+  "steadiness",
+  "horizon",
+  "depth",
+  "framing_point"
+ ],
+ "edited_by": "Sexton (editor's eye) with Palmer's research as check; Diego to tune",
+ "date": "261114",
+ "note": "Starting points to tune on Diego's blind picks. A weight change with no why is refused. Counts never become a slider."
+}

@@ -1,0 +1,58 @@
+{
+ "name": "drama",
+ "says": [
+  "takes flight",
+  "fight",
+  "storm",
+  "hunt",
+  "chaos"
+ ],
+ "inherits": "best",
+ "hard": [
+  "arc_energy != held",
+  "subject_motion in medium / fast"
+ ],
+ "weights": [
+  {
+   "slider": "energy",
+   "weight": 0.35,
+   "why": "the shot changes: move, subject motion, arc"
+  },
+  {
+   "slider": "contrast",
+   "weight": 0.25,
+   "why": "hard key, deep ratio"
+  },
+  {
+   "slider": "purpose",
+   "weight": 0.2,
+   "why": "the eye must still have one thing to follow"
+  },
+  {
+   "slider": "cinematic",
+   "weight": 0.2,
+   "why": "side light and a tracking move are intent"
+  }
+ ],
+ "switches": {
+  "cap_staged_obvious": true
+ },
+ "tie_break": [
+  "emotion",
+  "believability",
+  "novelty_in_pool",
+  "handles",
+  "fewer_flags",
+  "licence"
+ ],
+ "must_cite": [
+  "camera_move",
+  "move_speed",
+  "subject_motion",
+  "arc_shape",
+  "lighting_ratio"
+ ],
+ "edited_by": "Sexton (editor's eye) with Palmer's research as check; Diego to tune",
+ "date": "261114",
+ "note": "Starting points to tune on Diego's blind picks. A weight change with no why is refused. Counts never become a slider."
+}

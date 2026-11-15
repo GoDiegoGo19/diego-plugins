@@ -1,0 +1,58 @@
+{
+ "name": "silhouette",
+ "says": [
+  "silhouette",
+  "against the sky",
+  "sunset",
+  "shape",
+  "lone"
+ ],
+ "inherits": "best",
+ "hard": [
+  "quality_of_light in silhouette / backlit-rim",
+  "time_of_day in dawn / golden / sunset"
+ ],
+ "weights": [
+  {
+   "slider": "contrast",
+   "weight": 0.4,
+   "why": "subject near black against a bright sky is the point"
+  },
+  {
+   "slider": "purpose",
+   "weight": 0.3,
+   "why": "a clean shape on a clean field"
+  },
+  {
+   "slider": "cinematic",
+   "weight": 0.15,
+   "why": "backlight is designed light"
+  },
+  {
+   "slider": "calm",
+   "weight": 0.15,
+   "why": "a held shape reads longer"
+  }
+ ],
+ "switches": {
+  "cap_staged_obvious": true,
+  "crushed_blacks_are_not_a_fault": true
+ },
+ "tie_break": [
+  "emotion",
+  "believability",
+  "novelty_in_pool",
+  "handles",
+  "fewer_flags",
+  "licence"
+ ],
+ "must_cite": [
+  "quality_of_light",
+  "time_of_day",
+  "levels",
+  "framing_point"
+ ],
+ "edited_by": "Sexton (editor's eye) with Palmer's research as check; Diego to tune",
+ "date": "261114",
+ "note": "Starting points to tune on Diego's blind picks. A weight change with no why is refused. Counts never become a slider."
+}

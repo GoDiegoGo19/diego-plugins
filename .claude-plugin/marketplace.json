@@ -1,0 +1,21 @@
+{
+  "name": "diego-plugins",
+  "owner": {
+    "name": "Diego"
+  },
+  "description": "Diego's filmmaking plugins for Claude Code.",
+  "plugins": [
+    {
+      "name": "watch-video",
+      "source": "./plugins/watch-video",
+      "description": "Watch a video or a folder of clips for the edit: tags, segments, tagline, shot sheet, contact-sheet PDF, write-up. Engine byte-identical to the scan plugin's; SEE weights inside (~83 MB). 2.0.0: read-shots writes a measured ledger and a filmmaker's sentence per shot, the reader is pinned and hash-checked, and /reflect ranks a watched pool against a plain-words ask over editable templates (best = most dynamic); counts never rank.",
+      "version": "2.0.0"
+    },
+    {
+      "name": "premiere-project-file-assembly",
+      "source": "./plugins/premiere-project-file-assembly",
+      "description": "Writes Premiere project files from a conversation, a new version each time. Scan data or a media folder becomes bins 00-05, per-card stringouts, INTERVIEWS/BROLL, timecode sync; a small model inside (MiniLM) organizes B-roll by topic, every take of a line, and selects from notes. iPhone footage handled (creation date, slo-mo, vertical, HDR, approximate sync). Writes .prproj with our own prwrite library; xmeml as last resort. Verified by reparse; unopened in Premiere.",
+      "version": "2.3.0"
+    }
+  ]
+}
