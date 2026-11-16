@@ -1,8 +1,8 @@
 {
   "name": "watch-video",
   "displayName": "Watch Video (go Diego go)",
-  "version": "2.0.0",
-  "description": "Watch a video or a folder of clips for the edit: tags, segments, tagline, shot sheet, contact-sheet PDF, write-up. Engine byte-identical to the scan plugin's; SEE weights inside (~83 MB). 2.0.0: read-shots writes a measured ledger and a filmmaker's sentence per shot, the reader is pinned and hash-checked, and /reflect ranks a watched pool against a plain-words ask over editable templates (best = most dynamic); counts never rank.",
+  "version": "2.2.0",
+  "description": "Watch a video, a folder or a whole volume for the edit. /run-volume identifies the media, routes it through the local models and writes a content ledger per folder (shot sentence, light, time of day, what is on screen, KEEP/MARGINAL/CUT with the reason) with no agents and no setup step: missing weights are fetched once, pinned and hash-checked. A measurement always beats the reader's guess. /reflect ranks a pool against a plain-words ask.",
   "author": {
     "name": "Diego"
   },

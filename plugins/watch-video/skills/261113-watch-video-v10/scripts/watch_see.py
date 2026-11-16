@@ -32,6 +32,7 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+PLUGIN = HERE.parent.parent.parent
 sys.path.insert(0, str(HERE))
 
 VIDEO_EXT = {".mov", ".mp4", ".mxf", ".m4v", ".avi", ".mts", ".m2ts", ".mkv", ".webm", ".mpg", ".mpeg"}
@@ -91,6 +92,28 @@ def clip_installed(p0_env, V):
 
 def tag_words(tags):
     return ", ".join("%s %s" % (a, t["value"]) for a, t in sorted(tags.items()) if t.get("value") not in (None, "CHECK"))
+
+
+def auto_provision():
+    """Fetch anything missing before the run, without asking (Diego's rule, 261116: it has to just work).
+
+    Free, pinned, sha256-checked weights into the plugin's own folder, and never fatal: no network means a
+    reduced run with a line saying what is reduced, not a failure. Set WATCH_NO_AUTO_INSTALL=1 to skip.
+    Anything paid, or anything outside this folder (apt, brew, pip, sudo), is still only ever reported.
+    """
+    if os.environ.get("WATCH_NO_AUTO_INSTALL"):
+        return ["auto-provision off (WATCH_NO_AUTO_INSTALL)"]
+    try:
+        import importlib.util
+        f = PLUGIN / "skills" / "261113-watch-video-v10" / "scripts" / "watch_setup.py"
+        if not f.exists():
+            return []
+        sp = importlib.util.spec_from_file_location("watch_setup", f)
+        m = importlib.util.module_from_spec(sp)
+        sp.loader.exec_module(m)
+        return m.ensure(download=True, quiet=False)
+    except Exception as e:  # noqa: BLE001  provisioning must never sink the run
+        return ["could not auto-provision: %s" % str(e)[:90]]
 
 
 def main(argv=None):

@@ -22,6 +22,7 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+PLUGIN = HERE.parent.parent.parent
 sys.path.insert(0, str(HERE))
 import shot_arc as A  # noqa: E402
 import shot_ledger as L  # noqa: E402
@@ -103,6 +104,48 @@ LANE_MAP = {
 }
 
 
+def hero_jpg(path, t, tmp, sid):
+    """Write the shot's hero frame to a file for the reader. Returns the path, or None if it cannot be written.
+
+    The name carries the SHOT id, not just the timestamp. 261116: it was `hero_<t>.jpg` in one shared folder,
+    and three clips whose hero frame both landed at 2.000 s wrote the same path. The reader caches image
+    features by path, so every shot after the first was read from the FIRST shot's picture and came back with
+    confident, identical answers for different footage. The wrong answer that looks right is the worst kind.
+    """
+    import re as _re
+    import subprocess
+    safe = _re.sub(r"[^A-Za-z0-9_.-]", "_", sid)[-80:]
+    f = Path(tmp) / ("hero_%s_%.3f.jpg" % (safe, t))
+    r = subprocess.run(["ffmpeg", "-nostdin", "-v", "error", "-y", "-ss", "%.3f" % max(t, 0), "-i", str(path),
+                        "-update", "1", "-frames:v", "1", str(f)], capture_output=True)
+    return f if (r.returncode == 0 and f.exists() and f.stat().st_size > 0) else None
+
+
+def read_lane_values(mod, path, t_in, t_out, r, model, tmp, measured_sid):
+    """The reader, on this shot's hero frame. {slot: {value, origin R, trust, evidence}} for what it resolved.
+
+    261116: this is what "the reader is installed but nothing uses it" was. The lane existed, the model loaded,
+    and the front door never called it, so every R slot stayed unread on every machine. An unresolved slot is
+    left out on purpose: the ledger then says unread, which is true, instead of carrying a guess.
+    """
+    f = hero_jpg(path, r["hero_t"], tmp, measured_sid)
+    if f is None:
+        return {}, "read_lane: could not write a hero frame (ffmpeg)"
+    measured = {"segment_id": "x", "source": str(f), "measures": r["mid_measures"], "transfer": r["transfer"]}
+    slots = [x for x in mod.READ_SLOTS if x not in mod.FORBIDDEN]
+    fields = mod.read(str(f), measured, slots, model=model)
+    out, unresolved = {}, 0
+    for k, v in fields.items():
+        if v["value"] in (mod.U, None):
+            unresolved += 1
+            continue
+        out[k] = {"value": v["value"], "origin": "R", "trust": v.get("trust", "approximate"),
+                  "evidence": v.get("evidence") or v.get("rule")}
+        if v.get("awaits_person"):
+            out[k]["awaits_person"] = True   # Diego's slot: a suggestion until he says otherwise
+    return out, "read_lane: %d of %d slot(s) read on the hero frame" % (len(out), len(slots))
+
+
 def lanes():
     """{name: (call, field map, kind)} for the lanes present, and a note per lane (present, called or skipped)."""
     got, notes = {}, []
@@ -122,9 +165,18 @@ def lanes():
             got[name] = (LANE_MAP[name][0], LANE_MAP[name][1], kind, mod)
             notes.append("%s: called through measure(); maps %s" % (name, ", ".join("%s->%s" % kv for kv in LANE_MAP[name][1].items())))
         elif name == "read_lane":
-            found = mod.find_model()[0] if hasattr(mod, "find_model") else None
-            notes.append("read_lane: present; %s" % ("model found but per-shot hero frames are not wired this round; R slots stay unread"
-                                                     if found else "no vision model installed; R slots stay unread"))
+            # A test, or a run that only wants the measured half, says so and the model is never loaded:
+            # 261116, the suite went from seconds to minutes once a reader was present on the machine.
+            if os.environ.get("READ_SHOTS_NO_VISION"):
+                notes.append("read_lane: skipped (READ_SHOTS_NO_VISION); R slots stay unread")
+                continue
+            model, why = mod.load_model() if hasattr(mod, "load_model") else (None, "no loader")
+            if model is None:
+                notes.append("read_lane: present but no usable vision model (%s); R slots stay unread" % why)
+            else:
+                got[name] = ("read_lane", None, "read", mod, model)
+                notes.append("read_lane: reading the hero frame of every shot (%s)"
+                             % ", ".join(sorted(getattr(model, "loaded", {}).values())) or "model loaded")
         elif name == "shot_decon" and hasattr(mod, "measure"):
             got[name] = (lambda mod, path, t_in, t_out, r: mod.measure(str(path), t0=r["hero_t"], t1=min(t_out, r["hero_t"] + 0.5)),
                          None, "decon", mod)
@@ -160,6 +212,28 @@ def read_notes(path):
     return out
 
 
+def auto_provision():
+    """Fetch anything missing before the run, without asking (Diego's rule, 261116: it has to just work).
+
+    Free, pinned, sha256-checked weights into the plugin's own folder, and never fatal: no network means a
+    reduced run with a line saying what is reduced, not a failure. Set WATCH_NO_AUTO_INSTALL=1 to skip.
+    Anything paid, or anything outside this folder (apt, brew, pip, sudo), is still only ever reported.
+    """
+    if os.environ.get("WATCH_NO_AUTO_INSTALL"):
+        return ["auto-provision off (WATCH_NO_AUTO_INSTALL)"]
+    try:
+        import importlib.util
+        f = PLUGIN / "skills" / "261113-watch-video-v10" / "scripts" / "watch_setup.py"
+        if not f.exists():
+            return []
+        sp = importlib.util.spec_from_file_location("watch_setup", f)
+        m = importlib.util.module_from_spec(sp)
+        sp.loader.exec_module(m)
+        return m.ensure(download=True, quiet=False)
+    except Exception as e:  # noqa: BLE001  provisioning must never sink the run
+        return ["could not auto-provision: %s" % str(e)[:90]]
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("src", help="a clip, a folder of clips, or a watch.json from the SEE pass")
@@ -169,13 +243,18 @@ def main(argv=None):
     a = ap.parse_args(argv)
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
+    reduced = auto_provision()
     ledger_p, suf = next_name(out, "ledger", ".jsonl")
     meas_p, src_p, read_p = (out / ("%s%s.jsonl" % (s, suf)) for s in ("measures", "source", "read"))
     md_p, sum_p = out / ("sentences%s.md" % suf), out / ("read_shots%s.json" % suf)
     hooks, lane_notes = lanes()
+    lane_notes += ["reduced: " + n for n in reduced]  # what this machine could not provision goes in the record
     notes = read_notes(a.notes)
     clips, skipped = clips_of(a.src)
     meas, srcs, reads, cut_engines, pending = [], [], [], set(), []
+    import tempfile
+    _tmp = tempfile.TemporaryDirectory(prefix="read_shots_")
+    tmpdir = _tmp.name
     for path, root, segs in clips:
         probe = SM.ffprobe(path)
         if not probe.get("width"):
@@ -200,6 +279,12 @@ def main(argv=None):
                 try:
                     if entry[2] == "decon":
                         decon = entry[0](entry[3], path, t_in, t_out, r)
+                        continue
+                    if name == "read_lane":
+                        got, note = read_lane_values(entry[3], path, t_in, t_out, r, entry[4], tmpdir, sid)
+                        if sid == segs[0][0] or len(lane_notes) < 40:
+                            lane_notes.append("%s %s" % (sid, note))
+                        rd.update(got)
                         continue
                     got = lane_values(name, entry, path, t_in, t_out, r)
                 except Exception as e:  # a lane in progress must not stop the door

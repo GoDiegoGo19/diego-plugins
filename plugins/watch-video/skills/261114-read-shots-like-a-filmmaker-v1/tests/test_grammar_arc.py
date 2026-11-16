@@ -10,6 +10,8 @@ from pathlib import Path
 
 SKILL = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(SKILL / "scripts"))
+os.environ.setdefault("READ_SHOTS_NO_VISION", "1")   # the grammar and the front door, not the model
+os.environ.setdefault("WATCH_NO_AUTO_INSTALL", "1")  # and never a download from a test
 import read_shots as R  # noqa: E402
 import shot_arc as A  # noqa: E402
 import shot_ledger as L  # noqa: E402

@@ -31,6 +31,10 @@ from shot_ledger import SCHEMA, vocab  # noqa: E402  (read-only: the closed list
 U = "unresolved"
 MARGIN = 0.35          # nats, mean log-prob per label token, top minus runner-up
 EVIDENCE_WORDS = 25
+# A free-text answer that names the medium, or starts like a caption, is the model describing the picture
+# instead of answering the question. Refused for every bounded free-text slot (261116).
+MEDIUM = re.compile(r"\b(image|images|photo|photograph|picture|video|movie|film|frame|screenshot|footage|shot)\b", re.I)
+OPENER = re.compile(r"^\s*(the|this|that|there|it|a|an|in|here)\b\s+(is|are|was|were|appears|shows|depicts|looks|seems|we|you|image|picture|photo)\b", re.I)
 FORBIDDEN = {"var_casting": "var_casting comes from the stock listing or a person, never from the model (Sexton, grammar section 2)"}
 # the slots the lane fills: every R field in the ledger schema
 READ_SLOTS = [k for k, v in SCHEMA.items() if v[0] == "R"]
@@ -181,8 +185,15 @@ def prompt_for(slot, f, labels=None):
 
 # ---------------------------------------------------------------- the model adapter
 def model_dirs(flag=None):
-    out = [Path(flag)] if flag else []
-    out += [PLUGIN / "models" / "smolvlm", Path.home() / ".scan-and-index" / "models" / "smolvlm"]
+    """Where to look for the reader. An explicit --model is the ONLY place looked.
+
+    261116: the flag used to be the first of several candidates, so `--model /some/empty/dir` quietly loaded
+    whatever reader happened to be installed elsewhere. Naming a model has to mean that model, or a run that
+    thinks it is probing one build is really reporting another.
+    """
+    if flag:
+        return [Path(flag)]
+    out = [PLUGIN / "models" / "smolvlm", Path.home() / ".scan-and-index" / "models" / "smolvlm"]
     if os.environ.get("WATCH_MODELS_DIR"):
         out.append(Path(os.environ["WATCH_MODELS_DIR"]) / "smolvlm")
     return out
@@ -445,7 +456,13 @@ def read_slot(model, frame_path, slot, f, margin_min=MARGIN):
             n = bound_words(slot) or 4
             w = re.sub(r"[^\w' -]", " ", raw).split()
             value = " ".join(w[:n]) if w and not re.search(r"\d", " ".join(w[:n])) else None
-            rule = "text: bounded free text, <= %d words, no digits" % n
+            rule = "text: bounded free text, <= %d words, no digits, not about the medium"
+            rule = rule % n
+            # 261116: a free-text slot was taking the model's sentence opener, so subject_mods came back as
+            # "The image is" and a manner as "This is a movie". A descriptor of what is IN the frame never
+            # names the frame, and never opens like a caption. Both are refused, and the slot stays unresolved.
+            if value and (MEDIUM.search(value) or OPENER.match(value)):
+                return ans(U, slot, rule, "describes the medium or opens like a caption: %r" % clip_evidence(raw))
             if not value:
                 return ans(U, slot, rule, "empty or numeric output: %r" % clip_evidence(raw))
     ev = clip_evidence(model.generate(frame_path, "%s Field %s is '%s'. In one short line, what in the frame shows it?"

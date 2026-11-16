@@ -7,6 +7,7 @@ DINOv2-small, YOLOX-S, MiniLM and YuNet ship INSIDE this skill (models/), so the
 
     python3 watch_setup.py check            # read-only: python, onnxruntime, every weight's sha256 (bundled + the
                                             # downloaded reader), whether the reader's graphs actually open, ffprobe, cv2
+    python3 watch_setup.py ensure           # fetch what is missing (free, pinned, sha256-checked) WITHOUT asking
     python3 watch_setup.py install [--yes]  # prints the plan, ASKS, then pip-installs the pins and CLIP (core group)
 Exit 0 ok · 1 something missing (check) or an install step failed · 2 usage.
 """
@@ -160,6 +161,92 @@ def check():
     return 0 if not bad else 1
 
 
+# ---------------------------------------------------------------- provisioning that does not ask
+# Diego's rule, 261116: "things have to just work no matter what the instance." A fresh install has the
+# bundled weights (they ride in the package) but not CLIP or the reader, and the old behaviour was to print
+# a command for a human to go and run. On a new machine, or a cloud session, or a friend's laptop, that is a
+# broken skill. So the skill fetches them itself, with three limits that stay:
+#   - FREE and PINNED only: an exact revision, a sha256 checked after the download, deleted on mismatch.
+#   - into the PLUGIN'S OWN folder. Nothing system-wide, no sudo, no apt, no brew, no pip.
+#   - never fatal. No network, or a refused host, means it says what is reduced and carries on.
+# Anything paid, or anything that touches the machine outside this folder, still asks. That line does not move.
+READER_FILES = [rel for rel, _sha, required in READER if required]
+
+
+def _get(url, dest, want_sha, label):
+    """One pinned file, verified. Returns True when dest ends up correct."""
+    import urllib.request
+    if dest.exists() and sha256(dest) == want_sha:
+        return True
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    tmp = dest.with_suffix(dest.suffix + ".part")
+    try:
+        print("   fetching %s" % label, flush=True)
+        with urllib.request.urlopen(url, timeout=120) as r, open(tmp, "wb") as f:
+            while True:
+                b = r.read(1 << 20)
+                if not b:
+                    break
+                f.write(b)
+    except Exception as e:  # noqa: BLE001  no network is a reduced run, never a crash
+        tmp.unlink(missing_ok=True)
+        print("   could not fetch %s: %s" % (label, str(e)[:90]))
+        return False
+    got = sha256(tmp)
+    if got != want_sha:
+        tmp.unlink(missing_ok=True)
+        print("   %s FAILED sha256 (got %s, want %s): deleted, not used" % (label, got[:16], want_sha[:16]))
+        return False
+    tmp.replace(dest)
+    return True
+
+
+def ensure_reader(download=True):
+    """(ok, note) for the vision reader. Downloads the pinned SmolVLM ONNX parts into the plugin if missing."""
+    d = reader_dir() or (PLUGIN / "models" / "smolvlm")
+    missing = [rel for rel in READER_FILES if not (d / rel).exists()]
+    if not missing:
+        return True, "reader present"
+    if not download:
+        return False, "reader missing (%d file(s)); read slots stay unresolved" % len(missing)
+    print("reader: %d of %d pinned file(s) missing, fetching (~260 MB, revision %s)"
+          % (len(missing), len(READER_FILES), READER_REV[:12]))
+    base = "https://huggingface.co/%s/resolve/%s/" % (READER_REPO, READER_REV)
+    shas = {rel: sha for rel, sha, _r in READER}
+    got = all(_get(base + rel, d / rel, shas[rel], rel) for rel in missing)
+    return (got, "reader installed at %s" % d) if got else (False, "reader incomplete; read slots stay unresolved")
+
+
+def ensure_clip(download=True):
+    """(ok, note) for CLIP. Delegates to the engine's own pinned installer, which both skills share."""
+    v = vision()
+    if all(model_path("clip", f) is not None for f in v["models"]["clip"]["files"]):
+        return True, "CLIP present"
+    if not download:
+        return False, "CLIP missing; tags are skipped"
+    print("CLIP: fetching the pinned weights (~156 MB)")
+    r = subprocess.run([sys.executable, str(HERE / "p3_see_models.py"), "install", "core"])
+    ok = r.returncode == 0 and all(model_path("clip", f) is not None for f in v["models"]["clip"]["files"])
+    return (ok, "CLIP installed") if ok else (False, "CLIP not installed; tags are skipped")
+
+
+def ensure(download=True, quiet=False):
+    """Make this machine ready without asking. Returns a list of notes about anything still reduced."""
+    notes = []
+    for fn in (ensure_clip, ensure_reader):
+        ok, note = fn(download)
+        if not quiet:
+            print("%s %s" % ("ok  " if ok else "note", note))
+        if not ok:
+            notes.append(note)
+    for tool, what in (("tesseract", "on-screen text is skipped"), ("weasyprint", "the PDF sheet is skipped")):
+        if not (shutil.which(tool) or mod(tool)):
+            # A system package needs the machine's package manager, so this one still only reports.
+            notes.append("%s not installed, so %s (Mac: brew install %s)"
+                         % (tool, what, "tesseract" if tool == "tesseract" else "weasyprint"))
+    return notes
+
+
 def install(yes):
     v = vision()
     pins = list(v["packages"].get(machine()) or []) + list(v["packages"]["all"])
@@ -188,10 +275,17 @@ def install(yes):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["check", "install"])
+    ap.add_argument("cmd", choices=["check", "install", "ensure"])
     ap.add_argument("--yes", action="store_true")
+    ap.add_argument("--no-download", action="store_true", help="ensure: report what is missing, fetch nothing")
     a = ap.parse_args()
-    return check() if a.cmd == "check" else install(a.yes)
+    if a.cmd == "check":
+        return check()
+    if a.cmd == "ensure":
+        notes = ensure(download=not a.no_download)
+        print("result      %s" % ("ready, nothing reduced" if not notes else "running reduced: " + "; ".join(notes)))
+        return 0  # ensure NEVER fails a run: a reduced machine still works, it just does less
+    return install(a.yes)
 
 
 if __name__ == "__main__":

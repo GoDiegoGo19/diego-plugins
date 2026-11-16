@@ -372,8 +372,22 @@ def build(a):
         for name, g in gm.items():   # the other lanes (shot_motion, shot_light): a dedicated M lane wins; an R slot only when unread
             if name in GRAMMAR or name not in SCHEMA or not isinstance(g, dict) or g.get("value") in (None, U, UNREAD, ""):
                 continue
-            if check_value(name, g["value"]) is None and (SCHEMA[name][0] == "M" or fields[name]["value"] == UNREAD):
-                fields[name] = F(name, g["value"], g.get("evidence"), g.get("origin") or SCHEMA[name][0])
+            if check_value(name, g["value"]) is not None:
+                continue
+            cur = fields[name]
+            # A MEASUREMENT BEATS A GUESS. 261116: time_of_day and quality_of_light are nominally R slots, so the
+            # reader's answer was taken first and this loop could never put the measured one back: it only restored
+            # a slot whose schema said M, or one still unread. On a real pool that threw away shot_light's
+            # per-clip, evidence-backed night / day / soft / hard and replaced all of them with one confident
+            # word from the model, identical on every shot. That is the model overruling the instrument, which is
+            # the one thing this design does not allow. The reader's answer is kept beside it, never as the value.
+            beats = SCHEMA[name][0] == "M" or cur["value"] == UNREAD or cur.get("origin") == "R"
+            if not beats:
+                continue
+            ev = g.get("evidence")
+            if cur.get("origin") == "R" and cur["value"] != g["value"]:
+                ev = "%s (reader said %r on the hero frame; measured wins)" % (ev or "measured", cur["value"])
+            fields[name] = F(name, g["value"], ev, g.get("origin") or SCHEMA[name][0])
         if fields["camera_angle"]["value"] == UNREAD and fields["horizon"]["value"] == "dutch":
             fields["camera_angle"] = F("camera_angle", "dutch", fields["horizon"].get("evidence"), "M")
         prb = (rec.get("measures", {}).get("fidelity") or {}).get("value") or {}

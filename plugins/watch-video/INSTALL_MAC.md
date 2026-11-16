@@ -1,4 +1,4 @@
-# Install on the Mac (watch-video 2.0.0, read-shots 1.0) · 261114
+# Install on the Mac (watch-video 2.1.0, read-shots 1.0) · 261114
 
 Everything runs offline after this. Every download is pinned by revision and checked by sha256. Nothing here is paid. Written for the Intel iMac Pro (Python 3.12, onnxruntime 1.23.2); the Silicon pins are in the scan plugin's `rules.json`.
 

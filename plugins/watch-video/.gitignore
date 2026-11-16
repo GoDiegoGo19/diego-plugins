@@ -1,0 +1,4 @@
+
+# The reader is fetched on first run, never committed: decoder_model_merged_int8.onnx alone is 137 MB,
+# past GitHub's 100 MB hard limit, and its pins live in watch_setup.py so any machine can refetch it.
+models/smolvlm/
