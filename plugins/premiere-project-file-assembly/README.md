@@ -4,6 +4,28 @@ Talk to the model, get a Premiere project file. A new numbered version every tim
 
 How this plugin fits with scan and watch (shared IDs, which to reach for): see `HOW_THE_THREE_FIT.md`.
 
+## Before the first run (261116, from a friend's run on 103 stock clips)
+
+- **Python 3.9 or newer.** macOS ships 3.7 by default, and there is no onnxruntime wheel for it, so the
+  failure shows up far from its cause. `brew install python@3.12`, then use that interpreter.
+  `scripts/ppf_setup.py check` now says this in one line instead of letting pip fail.
+- **Unattended?** `ppf_setup.py install --yes`. Without a terminal it stops and says so rather than
+  waiting at a prompt nobody can answer.
+- **Two ways to organize, and the right one depends on where the media came from:**
+
+  | your media | use | what you get |
+  |---|---|---|
+  | camera cards | the default | bins by shoot day, read from each file's creation date |
+  | stock, or anything you already sorted into folders | `--by-folder` | bins that mirror your folder tree, one string-out per folder |
+
+  The default reads dates. For downloads that is the day you downloaded them, which mixed a DAY1 and a
+  DAY3 folder into one bin on the run that produced this note. `--by-folder` follows your folders instead.
+- **`--version N`** writes that version number. Numbering is per project name, so a new name restarts at
+  v001.
+- **Status, honestly:** every file this writes is verified by reparsing it, and files it wrote have **not
+  yet been opened in Premiere**. Open one and relink if anything shows offline.
+
+
 ## What it does
 
 1. **Reads your footage** from a scan clips CSV (the scan-and-index-hard-drives plugin) or straight from a media folder.

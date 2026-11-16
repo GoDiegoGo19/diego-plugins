@@ -89,9 +89,21 @@ def apply_ops(plan, objects, ops):
 
 def cmd_build(a):
     os.makedirs(a.out, exist_ok=True)
+    if getattr(a, "version", None):
+        # 261115: version numbers are per project NAME, so a second project restarts at v001 and a build that
+        # must sit beside an earlier one had to be renumbered by hand. --version says which number to write.
+        os.environ["PPF_FORCE_VERSION"] = str(a.version)
     obj_path = os.path.join(a.out, "%s_objects.json" % a.project)
     args = [a.source, "--out", obj_path] + (["--media-root", a.media_root] if a.media_root else [])
     objects = ppf_ingest.main(args); objects["_path"] = os.path.abspath(obj_path)
+    if getattr(a, "by_folder", False):
+        clips = objects.get("clips") or objects.get("objects") or []
+        ppf_ingest.by_folder(clips, os.path.basename(os.path.abspath(a.source)) or "FOLDER")
+        objects["organized_by"] = "folder"
+        with open(obj_path, "w", encoding="utf-8") as f:
+            json.dump(objects, f, indent=1)
+        print("ingest: --by-folder, bins mirror the source tree: %s"
+              % ", ".join(sorted({"%s/%s" % (c["day"], c["card"]) for c in clips})[:6]))
     notes = open(a.notes, encoding="utf-8").read() if a.notes else None
     plan = ppf_plan.build_plan(objects, a.project, a.date, notes, not a.no_organize, a.top, a.engine)
     res = write_out(plan, objects, a.out, a.to, a.base, a.multicam)
@@ -128,6 +140,9 @@ def main(argv=None):
     b.add_argument("--top", type=int, default=5, help="selects per note (with --notes)")
     b.add_argument("--engine", default="auto", choices=["auto", "minilm", "tfidf"], help="organize engine (auto: MiniLM, else TF-IDF)")
     b.add_argument("--no-organize", action="store_true", help="skip the content layer (topics, takes, selects)")
+    b.add_argument("--by-folder", action="store_true",
+                   help="bins mirror the source folders instead of the shoot date (stock, or anything already sorted)")
+    b.add_argument("--version", type=int, help="force this version number instead of the next free one")
     r = sp.add_parser("revise"); r.add_argument("plan"); r.add_argument("--ops", required=True); r.add_argument("--out")
     for x in (b, r):
         x.add_argument("--to", choices=["prproj", "xmeml"], default="prproj"); x.add_argument("--base", help="user's .prproj (prproj only; omitted = fresh project)")

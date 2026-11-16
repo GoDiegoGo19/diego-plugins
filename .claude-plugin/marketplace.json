@@ -14,8 +14,8 @@
     {
       "name": "premiere-project-file-assembly",
       "source": "./plugins/premiere-project-file-assembly",
-      "description": "Writes Premiere project files from a conversation, a new version each time. Scan data or a media folder becomes bins 00-05, per-card stringouts, INTERVIEWS/BROLL, timecode sync; a small model inside (MiniLM) organizes B-roll by topic, every take of a line, and selects from notes. iPhone footage handled (creation date, slo-mo, vertical, HDR, approximate sync). Writes .prproj with our own prwrite library; xmeml as last resort. Verified by reparse; unopened in Premiere.",
-      "version": "2.3.0"
+      "description": "Writes Premiere project files from a conversation, a new version each time. A media folder or scan data becomes bins, per-card string-outs, interviews and b-roll, and timecode-synced sequences. --by-folder mirrors your folder tree instead of file dates, for stock or pre-sorted media. A small model inside (MiniLM) groups b-roll by topic and finds every take of a line. Needs Python 3.9+. Verified by reparse; not yet opened in Premiere.",
+      "version": "2.4.0"
     }
   ]
 }

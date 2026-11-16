@@ -31,13 +31,41 @@ def sha256(p):
     return h.hexdigest()
 
 
+MIN_PY = (3, 9)
+
+
+def python_line(v=None):
+    """(ok, one line saying what to do about this interpreter). The version is not optional knowledge:
+    261115, a friend's run hit macOS's default python3 3.7, pip found no onnxruntime wheel for it, and the
+    failure surfaced far from its cause."""
+    v = v or sys.version_info[:3]
+    if tuple(v[:2]) >= MIN_PY:
+        return True, ""
+    return False, ("python %d.%d is too old for this plugin (needs %d.%d+; macOS ships 3.7 by default).\n"
+                   "    brew install python@3.12   then rerun with python3.12, or:\n"
+                   "    /opt/homebrew/bin/python3.12 -m venv ~/.ppf/venv  (Intel: /usr/local/bin/python3.12)"
+                   % (v[0], v[1], MIN_PY[0], MIN_PY[1]))
+
+
 def install(yes=False):
     py = shutil.which("python3") or sys.executable
+    pv = subprocess.run([py, "-c", "import sys;print('%d %d %d' % sys.version_info[:3])"],
+                        capture_output=True, text=True).stdout.split()
+    ok, why = python_line([int(x) for x in pv] if len(pv) == 3 else None)
+    if not ok:
+        print("ppf setup: " + why, file=sys.stderr)
+        return 2
     print("ppf setup will:")
     print("  1. create %s with %s (%s)" % (PPF_VENV, py, platform.python_version()))
     print("  2. pip install --only-binary=:all: %s" % " ".join(PINS))
     print("  nothing else; the model itself is already inside the plugin (models/minilm)")
     if not yes:
+        # 261115: run from a script with nobody at the keyboard, this blocked on input() forever. A prompt
+        # with no one to answer it is not a prompt; say what to pass and stop.
+        if not sys.stdin.isatty():
+            print("setup: nothing done. Nobody is at the keyboard (stdin is not a terminal), so there is no\n"
+                  "       one to answer the question. Rerun as:  ppf_setup.py install --yes", file=sys.stderr)
+            return 2
         if input("go ahead? [y/N] ").strip().lower() not in ("y", "yes"):
             print("setup: nothing done"); return 1
     if not venv_python():
@@ -53,7 +81,11 @@ def check():
     vp = venv_python()
     py = vp or sys.executable
     v = subprocess.run([py, "-c", "import sys;print(sys.version.split()[0])"], capture_output=True, text=True).stdout.strip()
+    pok, pwhy = python_line([int(x) for x in v.split(".")] if v.count(".") == 2 else None)
     print("python      %s  %s%s" % (v, py, "" if vp else "  (no ~/.ppf/venv: current python; run ppf_setup.py to make one)"))
+    if not pok:
+        ok = False
+        print("            TOO OLD. " + pwhy.replace("\n", "\n            "))
     r = subprocess.run([py, "-c", "import onnxruntime, numpy;print(onnxruntime.__version__, numpy.__version__)"], capture_output=True, text=True)
     if r.returncode == 0:
         o, n = r.stdout.split()

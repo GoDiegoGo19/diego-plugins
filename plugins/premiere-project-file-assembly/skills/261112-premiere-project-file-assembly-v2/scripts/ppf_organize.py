@@ -202,6 +202,21 @@ def takes(items, seqs, day, fmt):
     return made
 
 
+def dedupe_ids(ids):
+    """The same clip never appears twice in one topic sequence.
+
+    261115, a stock pull: a topic grouped by the words in file names and paired clip 6633748 from DAY1 with
+    the same clip 6633748 from DAY3, so the sequence cut a shot against itself. Diego's RULE ZERO is that the
+    same clip, title or shoot never appears twice in one video; a topic sequence is a video.
+    """
+    seen, out = set(), []
+    for i in sorted(ids):
+        if i not in seen:
+            seen.add(i)
+            out.append(i)
+    return out
+
+
 def organize(objects, plan_ops, date, notes=None, top=5, engine="auto", model_dir=None, fmt_of=None, log=print):
     """-> (ops, info). ops are appended to the plan; info = {engine, topics, takes, selects, report}."""
     dom, vfr_ids = conform_clips(objects["clips"])      # idempotent; ppf_plan has usually done it already
@@ -242,7 +257,8 @@ def organize(objects, plan_ops, date, notes=None, top=5, engine="auto", model_di
                 pl = [(by_rel[r["rel_path"]], float(r.get("t_in") or 0), float(r.get("t_out") or by_rel[r["rel_path"]]["duration_s"])) for r in rs]
                 n = seqs.add("%s_BROLL_%s" % (d, slug(label)), "01_SEQUENCES/%s/TOPICS" % d, "topic", pl,
                              fmt_of([by_rel[x] for x in cl]), {"topic": label, "family": k if k in fams else None})
-                info["topics"].append({"day": d, "seq": n, "label": label, "clips": sorted(by_rel[x]["clip_id"] for x in cl)})
+                info["topics"].append({"day": d, "seq": n, "label": label,
+                                       "clips": dedupe_ids(by_rel[x]["clip_id"] for x in cl)})
             items = [(by_rel[r["rel_path"]], float(r.get("t_in") or 0), float(r.get("t_out") or 0), r.get("text") or "")
                      for r in ds if (r.get("text") or "").strip()]
             src = objects.get("source")
@@ -272,7 +288,8 @@ def organize(objects, plan_ops, date, notes=None, top=5, engine="auto", model_di
                     n = seqs.add("%s_BROLL_%s" % (d, slug(label)), "01_SEQUENCES/%s/TOPICS" % d, "topic",
                                  [(broll[i], 0.0, broll[i]["duration_s"]) for i in g], fmt_of([broll[i] for i in g]),
                                  {"topic": label, "cohesion": round(sum(S[i][j] for i in g for j in g) / len(g) ** 2, 3)})
-                    info["topics"].append({"day": d, "seq": n, "label": label, "clips": [broll[i]["clip_id"] for i in g]})
+                    info["topics"].append({"day": d, "seq": n, "label": label,
+                                           "clips": dedupe_ids(broll[i]["clip_id"] for i in g)})
             items = [(c, 0.0, c["duration_s"], side[c["clip_id"]]) for c in day if side[c["clip_id"]]]
             info["takes"] += takes(items, seqs, d, fmt_of([i[0] for i in items]))
     for t in info["topics"]:

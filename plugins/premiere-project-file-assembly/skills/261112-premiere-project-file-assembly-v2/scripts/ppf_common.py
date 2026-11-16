@@ -145,6 +145,13 @@ def save_json(p, obj):
 
 
 def next_version_path(out_dir, project, ext):
+    forced = os.environ.get("PPF_FORCE_VERSION")
+    if forced and forced.isdigit():
+        n = int(forced)
+        p = os.path.join(out_dir, "%s_v%03d%s" % (project, n, ext))
+        if os.path.exists(p):
+            raise SystemExit("ppf: --version %d is taken (%s). Nothing is ever overwritten; pick another." % (n, p))
+        return p, n
     """<project>_v<NNN><ext>, the first number not taken by ANY ext of this project. Never overwrites."""
     os.makedirs(out_dir, exist_ok=True)
     pat = re.compile(r"^%s_v(\d{3})\." % re.escape(project))

@@ -70,6 +70,35 @@ def day_and_card(rel, path, pf=None):
     return d, card, "mtime", False
 
 
+def by_folder(clips, root_name="FOLDER"):
+    """Re-label every clip so the bins MIRROR THE SOURCE TREE instead of the shoot day.
+
+    261115, a stock pull: auto-organize read each file's date, which for downloads is the day it was
+    downloaded, and built bins 261113 / 261114 that mixed DAY1 with DAY3. Dates are the right answer for
+    camera cards, where the folder is a card and the date is the shoot. They are the wrong answer for stock,
+    or for anything a person has already sorted into folders, where the FOLDER is the intent.
+
+    day  = the first folder under the root (DAY1), card = the next one (ACT1), both from rel_path.
+    Everything downstream (bins, one stringout per card per day, topics) then follows the tree unchanged.
+    """
+    for c in clips:
+        parts = str(c.get("rel_path", "")).replace("\\", "/").split("/")
+        folders = parts[:-1]
+        c["day"] = folders[0] if folders else root_name
+        c["card"] = folders[1] if len(folders) > 1 else "LOOSE"
+        c["day_from"] = "folder (--by-folder)"
+        c["date_source"] = c["day_from"]
+    for i, c in enumerate(sorted(clips, key=lambda x: (x["day"], x["card"]))):
+        pass
+    seen = {}
+    for c in sorted(clips, key=lambda x: (x["day"], x["card"], x.get("rel_path", ""))):
+        k = (c["day"], c["card"])
+        if k not in seen:
+            seen[k] = "%02d" % (sum(1 for d, _ in seen if d == c["day"]) + 1)
+        c["card_no"] = seen[k]
+    return clips
+
+
 def iphone_fields(c, pf, fn):
     """Annotate one clip in place with the iPhone pack: date_source/shot_at, device, PHONE card (by day),
     orientation (display size after rotation), hdr/color_space."""

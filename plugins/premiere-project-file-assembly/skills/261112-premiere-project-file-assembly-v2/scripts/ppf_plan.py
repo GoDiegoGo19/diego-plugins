@@ -125,7 +125,12 @@ def build_plan(objects, project, date, notes=None, organize=True, top=5, engine=
         for kind, label in (("interview", "INTERVIEWS"), ("broll", "BROLL")):
             name = "%s_%s" % (d, label)
             kc = sorted([c for c in day if c["kind"] == kind], key=lambda c: (c["card_no"], c["rel_path"]))
-            ops.append(dict({"op": "add_sequence", "name": name, "bin": "01_SEQUENCES/%s" % d, "role": label.lower()}, **fmt_of(kc or day, dom.get(d))))
+            if not kc:
+                # 261115, a stock pull: an INTERVIEWS sequence was built for 103 silent stock clips and held
+                # nothing. An empty sequence is not a neutral extra; it is a thing the editor has to open to
+                # discover it is empty. A sequence with no clips is not made.
+                continue
+            ops.append(dict({"op": "add_sequence", "name": name, "bin": "01_SEQUENCES/%s" % d, "role": label.lower()}, **fmt_of(kc, dom.get(d))))
             t = 0.0
             for c in kc:
                 ops.append(place(name, c, "V1", round(t, 3), 0.0, c["duration_s"]))
@@ -155,7 +160,12 @@ def build_plan(objects, project, date, notes=None, organize=True, top=5, engine=
                 ops.append(place(name, by_id[i], "V%d" % (card_order.index(by_id[i]["card"]) + 1),
                                  round(rng[i][0] - t0, 3), 0.0, by_id[i]["duration_s"]))
         tc_ids = {i for g in groups for i in g} | {c["clip_id"] for c in day if tc_range_s(c)}
-        for n, (g, wr) in enumerate(approx_groups([c for c in day if c["clip_id"] not in tc_ids]), 1):
+        # Approximate sync lines clips up by wall clock so an editor can nudge them against the AUDIO.
+        # With no audio there is nothing to check it against, so the sequence cannot be verified or used:
+        # 261115, a stock pull with no audio and no timecode still got SYNC_approx groups. Silent clips are
+        # not candidates for it. Real-timecode groups above are unaffected; those stand on the timecode.
+        approx_in = [c for c in day if c["clip_id"] not in tc_ids and (c.get("audio_channels") or 0) > 0]
+        for n, (g, wr) in enumerate(approx_groups(approx_in), 1):
             name = "%s_SYNC_approx_%d" % (d, n)       # never mixed with true-TC groups
             ops.append(dict({"op": "add_sequence", "name": name, "bin": "01_SEQUENCES/%s" % d, "role": "sync_approx",
                              "approx": True, "note": "wall-clock sync, check against audio"}, **fmt_of(g, dom.get(d))))
