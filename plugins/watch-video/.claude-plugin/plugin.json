@@ -1,8 +1,8 @@
 {
   "name": "watch-video",
   "displayName": "Watch Video (go Diego go)",
-  "version": "2.2.0",
-  "description": "Watch a video, a folder or a whole volume for the edit. /run-volume identifies the media, routes it through the local models and writes a content ledger per folder (shot sentence, light, time of day, what is on screen, KEEP/MARGINAL/CUT with the reason) with no agents and no setup step: missing weights are fetched once, pinned and hash-checked. A measurement always beats the reader's guess. /reflect ranks a pool against a plain-words ask.",
+  "version": "2.3.0",
+  "description": "Watch a video, a folder or a whole volume for the edit. /run-volume identifies the media, routes it through the local models and writes a content ledger per folder (shot sentence, light, time of day, what is on screen, KEEP/MARGINAL/CUT with the reason), no agents and no setup step. Needs Python 3.9+. A measurement always beats the reader's guess, and the summary says plainly when the reader did not run. /reflect ranks a pool against an ask.",
   "author": {
     "name": "Diego"
   },

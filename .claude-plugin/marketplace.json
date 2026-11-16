@@ -8,14 +8,14 @@
     {
       "name": "watch-video",
       "source": "./plugins/watch-video",
-      "description": "Watch a video, a folder or a whole volume for the edit. /run-volume identifies the media, routes it through the local models and writes a content ledger per folder (shot sentence, light, time of day, what is on screen, KEEP/MARGINAL/CUT with the reason) with no agents and no setup step: missing weights are fetched once, pinned and hash-checked. A measurement always beats the reader's guess. /reflect ranks a pool against a plain-words ask.",
-      "version": "2.2.0"
+      "description": "Watch a video, a folder or a whole volume for the edit. /run-volume identifies the media, routes it through the local models and writes a content ledger per folder (shot sentence, light, time of day, what is on screen, KEEP/MARGINAL/CUT with the reason), no agents and no setup step. Needs Python 3.9+. A measurement always beats the reader's guess, and the summary says plainly when the reader did not run. /reflect ranks a pool against an ask.",
+      "version": "2.3.0"
     },
     {
       "name": "premiere-project-file-assembly",
       "source": "./plugins/premiere-project-file-assembly",
-      "description": "Writes Premiere project files from a conversation, a new version each time. A media folder or scan data becomes bins, per-card string-outs, interviews and b-roll, and timecode-synced sequences. --by-folder mirrors your folder tree instead of file dates, for stock or pre-sorted media. A small model inside (MiniLM) groups b-roll by topic and finds every take of a line. Needs Python 3.9+. Verified by reparse; not yet opened in Premiere.",
-      "version": "2.4.0"
+      "description": "Writes Premiere project files from a conversation, a new version each time. A media folder or scan data becomes bins, per-card string-outs, interviews and b-roll, and timecode-synced sequences. --by-folder mirrors your folder tree instead of file dates, for stock or pre-sorted media. A small model inside (MiniLM) groups b-roll by topic and finds every take of a line. Needs Python 3.9+.",
+      "version": "2.4.1"
     }
   ]
 }

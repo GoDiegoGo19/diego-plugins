@@ -215,6 +215,7 @@ def main(argv=None):
     out = Path(a.out).resolve()
     stamp = dt.datetime.now().strftime("%y%m%d")
     done, summary = [], []
+    vision_ok, vision_notes, vision_by_job = False, [], {}
     for i, (job, folder, clips) in enumerate(jobs, 1):
         work = out / job
         print("\n[%d/%d] %s - %d clip(s), models running here" % (i, len(jobs), job, len(clips)), flush=True)
@@ -226,6 +227,16 @@ def main(argv=None):
             summary.append((job, len(clips), None))
             continue
         rows = [json.loads(x) for x in led.read_text().splitlines() if x.strip()]
+        summ = work / "read_shots.json"
+        if summ.exists():
+            lanes = (json.loads(summ.read_text()) or {}).get("lanes") or []
+            vision_by_job[job] = any("read_lane: reading the hero frame" in x for x in lanes)
+            for ln in lanes:
+                if "read_lane: reading the hero frame" in ln:
+                    vision_ok = True
+                elif "read_lane" in ln or "CANNOT RUN" in ln or ln.startswith("reduced:"):
+                    if ln not in vision_notes:
+                        vision_notes.append(ln)
         csv_p, md_p, counts = write_job(work, job, rows_for(rows, sentences_of(work / "sentences.md"),
                                                                  durations_of(work / "measures.jsonl")), stamp)
         print("   %s  KEEP %d / MARGINAL %d / CUT %d" % (csv_p.name, *counts))
@@ -233,11 +244,24 @@ def main(argv=None):
         summary.append((job, len(clips), counts))
 
     s = ["# %s - volume summary" % stamp, "", "Volume: `%s`" % root, "",
-         "| job | clips | KEEP | MARGINAL | CUT |", "|---|---|---|---|---|"]
+         "| job | clips | KEEP | MARGINAL | CUT | vision |", "|---|---|---|---|---|---|"]
     for job, n, c in summary:
-        s.append("| %s | %d | %s |" % (job, n, " | ".join(str(x) for x in c) if c else "not read | - | -"))
-    s += ["", "Every row was judged from the frames by the models on this machine. No agent was involved and no",
-          "title was read as evidence. The ledgers are beside this file, one folder per job."]
+        vz = "read" if job in vision_by_job and vision_by_job[job] else ("OFF" if job in vision_by_job else "-")
+        s.append("| %s | %d | %s | %s |" % (job, n, " | ".join(str(x) for x in c) if c else "not read | - | -", vz))
+    # 261115: this line said the models judged every row even on a run where the reader never loaded. A summary
+    # that overstates what ran is worse than no summary: it is the one file a person believes without checking.
+    s += ["", "## What actually ran", ""]
+    if vision_ok:
+        s += ["The measured lanes and the local reader both ran. Light, time of day, camera move and framing are",
+              "measured from the pixels; subject, action, place and mood are read. No agent was involved and no",
+              "title was read as evidence."]
+    else:
+        s += ["**VISION OFF: subject, verb and place are unread on every row.** The reader did not run, so those",
+              "columns are empty and `what_is_on_screen` is thin. Everything measured (light, time of day, camera",
+              "move, framing, levels) is still true. Why it did not run:", ""]
+        s += ["- %s" % n for n in (vision_notes or ["reason not recorded"])]
+        s += ["", "Fix that and run again for the read columns."]
+    s += ["", "The ledgers are beside this file, one folder per job."]
     (out).mkdir(parents=True, exist_ok=True)
     sp = out / ("%s_volume_summary.md" % stamp)
     sp.write_text("\n".join(s) + "\n")

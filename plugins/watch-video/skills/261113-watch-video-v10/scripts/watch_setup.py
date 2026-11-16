@@ -128,8 +128,18 @@ def mod(name):
         return None
 
 
+MIN_PY = (3, 9)
+
+
 def check():
     v, bad = vision(), 0
+    if sys.version_info[:2] < MIN_PY:
+        # 261115: macOS ships python3 3.7, there is no onnxruntime wheel for it, and the failure then shows up
+        # far from its cause. Say it here, first line, before anything else is reported.
+        print("python      %d.%d  TOO OLD. This needs %d.%d+ (macOS ships 3.7).\n"
+              "            brew install python@3.12   then rerun with python3.12"
+              % (sys.version_info[0], sys.version_info[1], MIN_PY[0], MIN_PY[1]))
+        bad += 1
     want_py = v["packages"]["python"]
     py = "%d.%d" % sys.version_info[:2]
     print("python      %s%s" % (py, "" if py == want_py else "   (the pinned environment is %s; others usually work)" % want_py))
@@ -230,9 +240,31 @@ def ensure_clip(download=True):
     return (ok, "CLIP installed") if ok else (False, "CLIP not installed; tags are skipped")
 
 
+# The reader needs these THREE importable, not just its weights on disk. 261115: a run had the weights and
+# no tokenizers, so SmolVLM could not load, the vision lane went quiet, and the run still finished saying the
+# models had judged the footage. Weights present is not the same as a reader that runs.
+READER_IMPORTS = (("onnxruntime", "onnxruntime"), ("tokenizers", "tokenizers"), ("PIL", "pillow"))
+
+
+def reader_imports_missing():
+    out = []
+    for mod_name, pip_name in READER_IMPORTS:
+        if mod(mod_name) is None:
+            out.append(pip_name)
+    return out
+
+
 def ensure(download=True, quiet=False):
     """Make this machine ready without asking. Returns a list of notes about anything still reduced."""
     notes = []
+    miss = reader_imports_missing()
+    if miss:
+        v = vision()
+        pins = [x for x in v["packages"]["all"] if x.split("=")[0].lower() in [m.lower() for m in miss]]
+        notes.append("the reader CANNOT RUN: %s not importable. Install: pip install %s"
+                     % (", ".join(miss), " ".join(pins or miss)))
+        if not quiet:
+            print("note %s" % notes[-1])
     for fn in (ensure_clip, ensure_reader):
         ok, note = fn(download)
         if not quiet:

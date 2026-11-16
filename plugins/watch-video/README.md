@@ -1,4 +1,4 @@
-# 261114 · Watch Video (go Diego go) · plugin v2.2.0 (skills 261113-watch-video-v10, 261114-read-shots-like-a-filmmaker-v1)
+# 261114 · Watch Video (go Diego go) · plugin v2.3.0 (skills 261113-watch-video-v10, 261114-read-shots-like-a-filmmaker-v1)
 
 **Verify an install with one command:** `bash plugins/watch-video/verify.sh` prints WORKS, SEE PASS READY / READER NOT INSTALLED, or NOT READY with the list.
 

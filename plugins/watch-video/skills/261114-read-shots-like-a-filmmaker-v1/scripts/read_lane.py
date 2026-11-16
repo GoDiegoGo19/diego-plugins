@@ -33,8 +33,14 @@ MARGIN = 0.35          # nats, mean log-prob per label token, top minus runner-u
 EVIDENCE_WORDS = 25
 # A free-text answer that names the medium, or starts like a caption, is the model describing the picture
 # instead of answering the question. Refused for every bounded free-text slot (261116).
+# Slots whose default is the usual truth, and the bar a model must clear to claim otherwise.
+# Ordinary slots use MARGIN; these need a wide gap, because the cost of a false claim is a wrong reason
+# attached to every clip in a pool.
+DEFAULTS = {"cliche_markers": "none", "colour_cast": "none"}
+CLAIM_MARGIN = 1.25
+
 MEDIUM = re.compile(r"\b(image|images|photo|photograph|picture|video|movie|film|frame|screenshot|footage|shot)\b", re.I)
-OPENER = re.compile(r"^\s*(the|this|that|there|it|a|an|in|here)\b\s+(is|are|was|were|appears|shows|depicts|looks|seems|we|you|image|picture|photo)\b", re.I)
+OPENER = re.compile(r"^\s*(the|this|that|there|it|a|an|in|here)\b\s+(\w+\s+)?(is|are|was|were|appears|shows|depicts|looks|seems)\b|^\s*(we|you)\b", re.I)
 FORBIDDEN = {"var_casting": "var_casting comes from the stock listing or a person, never from the model (Sexton, grammar section 2)"}
 # the slots the lane fills: every R field in the ledger schema
 READ_SLOTS = [k for k, v in SCHEMA.items() if v[0] == "R"]
@@ -161,6 +167,28 @@ def labels_for(slot):
     if isinstance(spec, tuple) and spec[0] == "vocab":
         return vocab(spec[1])
     return None  # bounded free text
+
+
+def echoes_question(value, slot, prompt):
+    """True when the answer is the question coming back.
+
+    261115, on a real pool: free-text slots came back holding "The subject is", "Subject_mods" and
+    "Where is this" — the model repeating the prompt, which the word-count filter happily accepted because
+    it was short and had no digits. Two checks: the slot's own name is never part of an answer, and an
+    answer that is three consecutive words lifted out of the question is the question.
+    """
+    v = re.sub(r"[^a-z0-9 ]", " ", (value or "").lower()).split()
+    if not v:
+        return True
+    if slot.lower() in " ".join(v) or slot.replace("_", " ").lower() in " ".join(v):
+        return True
+    q = re.sub(r"[^a-z0-9 ]", " ", (prompt or "").lower()).split()
+    if len(v) >= 3 and q:
+        qs = " ".join(q)
+        for i in range(len(v) - 2):
+            if " ".join(v[i:i + 3]) in qs:
+                return True
+    return False
 
 
 def bound_words(slot):
@@ -443,6 +471,15 @@ def read_slot(model, frame_path, slot, f, margin_min=MARGIN):
         rule = "logits: mean log-prob per token over %d allowed labels; margin >= %.2f" % (len(labels), margin_min)
         if mg is not None and mg < margin_min:
             return ans(U, slot, rule, "low margin: %s %.3f over %s" % (top, mg, labels[order[1]]), None, round(mg, 3))
+        # Some slots have a default that is almost always the truth, and a model that names the exception on
+        # every frame is noise, not detection. 261115, a real pool: "stethoscope draped" came back on most of
+        # 103 clips whatever was in them, and every clip inherited a nonsense reason. Claiming the exception
+        # has to clear a much higher bar than ordinary slots; short of that the answer is the default.
+        if slot in DEFAULTS and top != DEFAULTS[slot]:
+            if mg is None or mg < CLAIM_MARGIN:
+                return ans(DEFAULTS[slot], slot, rule,
+                           "%r did not clear the claim margin (%.3f < %.2f); using the default"
+                           % (top, mg or 0.0, CLAIM_MARGIN), None, round(mg, 3) if mg is not None else None)
         value, mg = top, (round(mg, 3) if mg is not None else None)
     else:
         raw = model.generate(frame_path, prompt, 30)
@@ -463,6 +500,8 @@ def read_slot(model, frame_path, slot, f, margin_min=MARGIN):
             # names the frame, and never opens like a caption. Both are refused, and the slot stays unresolved.
             if value and (MEDIUM.search(value) or OPENER.match(value)):
                 return ans(U, slot, rule, "describes the medium or opens like a caption: %r" % clip_evidence(raw))
+            if value and echoes_question(value, slot, prompt):
+                return ans(U, slot, rule, "echoed the question back instead of answering: %r" % clip_evidence(raw))
             if not value:
                 return ans(U, slot, rule, "empty or numeric output: %r" % clip_evidence(raw))
     ev = clip_evidence(model.generate(frame_path, "%s Field %s is '%s'. In one short line, what in the frame shows it?"

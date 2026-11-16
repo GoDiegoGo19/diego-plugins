@@ -263,8 +263,12 @@ def main(argv=None):
     ap.add_argument("source", help="scan P6 clips CSV, or a media folder (drive root)")
     ap.add_argument("--media-root", help="drive root the scan's rel_path is relative to")
     ap.add_argument("--drive", help="drive name (default: folder name of the media root)")
-    ap.add_argument("--out", required=True)
+    ap.add_argument("--out", required=True, help="a FILE path for the objects json (a folder gets objects.json inside it)")
     a = ap.parse_args(argv)
+    if os.path.isdir(a.out):
+        # 261115: handed a folder, this died with IsADirectoryError deep in the writer. A folder is a
+        # reasonable thing to point at; put the file inside it rather than crash.
+        a.out = os.path.join(a.out, "objects.json")
     if a.source.lower().endswith(".csv"):
         drive = a.drive or os.path.basename(os.path.normpath(a.media_root or "DRIVE"))
         sidecars = []

@@ -148,7 +148,10 @@ def edges(y):
     bins = {"horizontal": 0.0, "vertical": 0.0, "diagonal": 0.0}
     angs = []
     if ls is not None:
-        for x1, y1, x2, y2 in ls[:, 0]:
+        # 261115, Diego's Mac: TypeError, cannot unpack non-iterable numpy.int32. HoughLinesP returns
+        # (N, 1, 4) on most builds and (N, 4) on some, and `ls[:, 0]` then hands back one int per row instead
+        # of a line. reshape(-1, 4) is right for both, and this crash killed the decon lane on every clip.
+        for x1, y1, x2, y2 in ls.reshape(-1, 4):
             L = math.hypot(x2 - x1, y2 - y1)
             a = math.degrees(math.atan2(-(y2 - y1), x2 - x1)) % 180
             angs.append((a, L, (x1 + x2) / 2, (y1 + y2) / 2))

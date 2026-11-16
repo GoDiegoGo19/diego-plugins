@@ -1,8 +1,8 @@
 {
   "name": "premiere-project-file-assembly",
   "displayName": "Premiere Project File Assembly (go Diego go)",
-  "version": "2.4.0",
-  "description": "Writes Premiere project files from a conversation, a new version each time. A media folder or scan data becomes bins, per-card string-outs, interviews and b-roll, and timecode-synced sequences. --by-folder mirrors your folder tree instead of file dates, for stock or pre-sorted media. A small model inside (MiniLM) groups b-roll by topic and finds every take of a line. Needs Python 3.9+. Verified by reparse; not yet opened in Premiere.",
+  "version": "2.4.1",
+  "description": "Writes Premiere project files from a conversation, a new version each time. A media folder or scan data becomes bins, per-card string-outs, interviews and b-roll, and timecode-synced sequences. --by-folder mirrors your folder tree instead of file dates, for stock or pre-sorted media. A small model inside (MiniLM) groups b-roll by topic and finds every take of a line. Needs Python 3.9+.",
   "author": {
     "name": "Diego"
   },
